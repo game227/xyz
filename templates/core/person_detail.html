@@ -1,60 +1,59 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}
 {% if person_kind == 'founder' %}{{ person.full_name }}{% else %}{{ person.get_full_name|default:person.username }}{% endif %} — {{ SITE_NAME }}
 {% endblock %}
+{% block extra_css %}
+<link href="{% static 'css/person_detail.css' %}?v=3" rel="stylesheet">
+{% endblock %}
 {% block content %}
-<section class="section person-detail">
-    <div class="container person-detail__wrap">
-        <a class="person-detail__back" href="{% url 'core:home' %}#{{ back_anchor }}">
-            <i class="bi bi-arrow-left"></i> Ortga
+<section class="pd">
+    <div class="pd__bg" aria-hidden="true"></div>
+    <div class="container pd__shell">
+        <a class="pd__back" href="{% url 'core:home' %}#{{ back_anchor }}">
+            <i class="bi bi-chevron-left"></i> Bosh sahifa
         </a>
 
-        <header class="person-detail__card person-detail__card--hero">
-            <div class="person-detail__media">
-                {% if person_kind == 'founder' %}
-                    {% if person.photo %}
-                        <img src="{{ person.photo.url }}" alt="{{ person.full_name }}">
+        <div class="pd__layout">
+            <aside class="pd__aside">
+                <div class="pd__photo">
+                    {% if person_kind == 'founder' %}
+                        {% if person.photo %}
+                            <img src="{{ person.photo.url }}" alt="{{ person.full_name }}">
+                        {% else %}
+                            <span>{{ person.full_name|make_list|first }}</span>
+                        {% endif %}
                     {% else %}
-                        <span class="person-detail__initial" aria-hidden="true">{{ person.full_name|make_list|first }}</span>
+                        {% if person.avatar %}
+                            <img src="{{ person.avatar.url }}" alt="{{ person.get_full_name }}">
+                        {% else %}
+                            <span>{{ person.first_name|default:person.username|make_list|first }}</span>
+                        {% endif %}
                     {% endif %}
-                {% else %}
-                    {% if person.avatar %}
-                        <img src="{{ person.avatar.url }}" alt="{{ person.get_full_name }}">
-                    {% else %}
-                        <span class="person-detail__initial person-detail__initial--moss" aria-hidden="true">
-                            {{ person.first_name|default:person.username|make_list|first }}
-                        </span>
-                    {% endif %}
-                {% endif %}
-            </div>
-            <div class="person-detail__intro">
-                <span class="person-detail__badge">
+                </div>
+                <span class="pd__chip">
                     {% if person_kind == 'founder' %}Asoschi{% else %}O‘qituvchi{% endif %}
                 </span>
-                <h1 class="person-detail__name">
+                <h1 class="pd__name">
                     {% if person_kind == 'founder' %}
                         {{ person.full_name }}
                     {% else %}
                         {{ person.get_full_name|default:person.username }}
                     {% endif %}
                 </h1>
-                <p class="person-detail__role">
+                <p class="pd__role">
                     {% if person_kind == 'founder' %}
                         {{ person.role_title }}
                     {% else %}
                         {{ person.specialty|default:"Matematika o‘qituvchisi" }}
                     {% endif %}
                 </p>
-                <div class="person-detail__links">
+                <div class="pd__social">
                     {% if person.telegram %}
-                        <a href="https://t.me/{{ person.telegram|cut:'@' }}" target="_blank" rel="noopener" aria-label="Telegram">
-                            <i class="bi bi-telegram"></i>
-                        </a>
+                        <a href="https://t.me/{{ person.telegram|cut:'@' }}" target="_blank" rel="noopener" aria-label="Telegram"><i class="bi bi-telegram"></i></a>
                     {% endif %}
                     {% if person_kind == 'founder' and person.linkedin_url %}
-                        <a href="{{ person.linkedin_url }}" target="_blank" rel="noopener" aria-label="LinkedIn">
-                            <i class="bi bi-linkedin"></i>
-                        </a>
+                        <a href="{{ person.linkedin_url }}" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
                     {% endif %}
                     {% if person.email %}
                         <a href="mailto:{{ person.email }}" aria-label="Email"><i class="bi bi-envelope"></i></a>
@@ -63,33 +62,45 @@
                         <a href="tel:{{ person.phone_number }}" aria-label="Telefon"><i class="bi bi-telephone"></i></a>
                     {% endif %}
                 </div>
+            </aside>
+
+            <div class="pd__main">
+                {% if person.full_bio or person.bio %}
+                <article class="pd__frame">
+                    <header class="pd__frame-head">
+                        <i class="bi bi-quote"></i>
+                        <h2>Umumiy ma'lumot</h2>
+                    </header>
+                    <div class="pd__frame-body">
+                        <p>{{ person.full_bio|default:person.bio|linebreaksbr }}</p>
+                    </div>
+                </article>
+                {% endif %}
+
+                {% if person.education %}
+                <article class="pd__frame">
+                    <header class="pd__frame-head">
+                        <i class="bi bi-mortarboard"></i>
+                        <h2>Ta'lim</h2>
+                    </header>
+                    <div class="pd__frame-body">
+                        <p>{{ person.education }}</p>
+                    </div>
+                </article>
+                {% endif %}
+
+                {% if person.achievements %}
+                <article class="pd__frame">
+                    <header class="pd__frame-head">
+                        <i class="bi bi-award"></i>
+                        <h2>Yutuqlar</h2>
+                    </header>
+                    <div class="pd__frame-body">
+                        <p>{{ person.achievements|linebreaksbr }}</p>
+                    </div>
+                </article>
+                {% endif %}
             </div>
-        </header>
-
-        <div class="person-detail__grid">
-            {% if person.full_bio or person.bio %}
-            <article class="person-detail__card person-detail__card--info">
-                <div class="person-detail__icon" aria-hidden="true"><i class="bi bi-person-lines-fill"></i></div>
-                <h2>Ma'lumot</h2>
-                <p>{{ person.full_bio|default:person.bio|linebreaksbr }}</p>
-            </article>
-            {% endif %}
-
-            {% if person.education %}
-            <article class="person-detail__card person-detail__card--info">
-                <div class="person-detail__icon" aria-hidden="true"><i class="bi bi-mortarboard-fill"></i></div>
-                <h2>Ta'lim</h2>
-                <p>{{ person.education }}</p>
-            </article>
-            {% endif %}
-
-            {% if person.achievements %}
-            <article class="person-detail__card person-detail__card--info">
-                <div class="person-detail__icon" aria-hidden="true"><i class="bi bi-trophy-fill"></i></div>
-                <h2>Yutuqlar</h2>
-                <p>{{ person.achievements|linebreaksbr }}</p>
-            </article>
-            {% endif %}
         </div>
     </div>
 </section>

@@ -57,10 +57,10 @@ Bu fayl loyihadagi UI va yangi funksiyalar bo‘yicha qilingan ishlarni doimiy y
 - Seed demo yangilandi
 
 ### 2026-07-25 — 5-bosqich (batafsil profil UI/UX)
-- Rasm kichikroq, yumaloq (oval) + mint border
-- Ma’lumot / Ta’lim / Yutuqlar alohida yumaloq ramka-kartochkalarda
-- Hero kartochka, badge, yumaloq social tugmalar, soft reveal animatsiya
-- Template: `templates/core/person_detail.html` + `static/css/main.css`
+- To‘liq qayta dizayn: `static/css/person_detail.css` (alohida, cache-bust `?v=3`)
+- Chapda qorong‘i panel + kichik yumaloq foto (88px)
+- O‘ngda ma’lumotlar 2px borderli yumaloq ramkalarda (sarlavha + body)
+- Template classlar: `.pd`, `.pd__aside`, `.pd__frame`
 
 ## Keyingi ixtiyoriy
 

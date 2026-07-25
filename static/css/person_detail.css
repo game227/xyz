@@ -1,0 +1,234 @@
+/* Person detail — full redesign (cache-bust via ?v=) */
+
+.pd {
+    position: relative;
+    padding: 1.5rem 0 3.5rem;
+    overflow: hidden;
+}
+
+.pd__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(700px 320px at 0% 0%, rgba(59, 224, 168, 0.22), transparent 60%),
+        radial-gradient(600px 280px at 100% 10%, rgba(15, 47, 40, 0.14), transparent 55%),
+        linear-gradient(180deg, #dff5eb 0%, #f4faf7 45%, #e7f3ee 100%);
+    z-index: 0;
+}
+
+.pd__shell {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+}
+
+.pd__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 1.15rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 1.5px solid rgba(15, 47, 40, 0.12);
+    color: #0f2f28;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(7, 24, 20, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pd__back:hover {
+    transform: translateX(-3px);
+    color: #159a6a;
+    box-shadow: 0 10px 22px rgba(7, 24, 20, 0.1);
+}
+
+.pd__layout {
+    display: grid;
+    gap: 1.15rem;
+}
+
+@media (min-width: 860px) {
+    .pd__layout {
+        grid-template-columns: 260px 1fr;
+        align-items: start;
+        gap: 1.4rem;
+    }
+}
+
+/* ——— Left profile panel ——— */
+.pd__aside {
+    text-align: center;
+    padding: 1.6rem 1.25rem 1.5rem;
+    border-radius: 2rem;
+    background: linear-gradient(165deg, #0c241f 0%, #14503f 48%, #0f3d32 100%);
+    color: #f2fff9;
+    border: 2px solid rgba(59, 224, 168, 0.35);
+    box-shadow:
+        0 22px 48px rgba(7, 24, 20, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    animation: pdIn 0.5s ease both;
+}
+
+.pd__photo {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, #1a5c48, #0f2f28);
+    border: 3px solid #3be0a8;
+    box-shadow: 0 0 0 6px rgba(59, 224, 168, 0.18);
+}
+
+.pd__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pd__photo span {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #3be0a8;
+}
+
+.pd__chip {
+    display: inline-flex;
+    padding: 0.28rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #0c241f;
+    background: #3be0a8;
+}
+
+.pd__name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0.75rem 0 0.3rem;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.pd__role {
+    margin: 0 0 1rem;
+    color: #9fe8cb;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.pd__social {
+    display: flex;
+    justify-content: center;
+    gap: 0.55rem;
+}
+
+.pd__social a {
+    width: 2.35rem;
+    height: 2.35rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(59, 224, 168, 0.35);
+    color: #3be0a8;
+    text-decoration: none;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.pd__social a:hover {
+    background: rgba(59, 224, 168, 0.2);
+    transform: translateY(-3px);
+    color: #fff;
+}
+
+/* ——— Framed info blocks ——— */
+.pd__main {
+    display: grid;
+    gap: 0.95rem;
+}
+
+.pd__frame {
+    border-radius: 1.75rem;
+    background: rgba(255, 255, 255, 0.92);
+    border: 2px solid rgba(15, 47, 40, 0.12);
+    box-shadow: 0 14px 36px rgba(7, 24, 20, 0.07);
+    overflow: hidden;
+    animation: pdIn 0.55s ease both;
+}
+
+.pd__frame:nth-child(1) { animation-delay: 0.08s; }
+.pd__frame:nth-child(2) { animation-delay: 0.16s; }
+.pd__frame:nth-child(3) { animation-delay: 0.24s; }
+
+.pd__frame-head {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1.2rem;
+    background: linear-gradient(90deg, rgba(59, 224, 168, 0.18), rgba(217, 246, 236, 0.35));
+    border-bottom: 2px solid rgba(21, 154, 106, 0.15);
+}
+
+.pd__frame-head i {
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 0.7rem;
+    background: #159a6a;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.pd__frame-head h2 {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: #0f2f28;
+}
+
+.pd__frame-body {
+    padding: 1.15rem 1.25rem 1.3rem;
+}
+
+.pd__frame-body p {
+    margin: 0;
+    color: #4d635b;
+    line-height: 1.65;
+    font-size: 0.98rem;
+}
+
+@keyframes pdIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (max-width: 859px) {
+    .pd__aside {
+        border-radius: 1.75rem;
+        padding-top: 1.35rem;
+    }
+
+    .pd__photo {
+        width: 76px;
+        height: 76px;
+    }
+}
