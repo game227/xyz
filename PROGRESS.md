@@ -56,6 +56,12 @@ Bu fayl loyihadagi UI va yangi funksiyalar bo‘yicha qilingan ishlarni doimiy y
 - Admin: “To‘liq profil” fieldset
 - Seed demo yangilandi
 
+### 2026-07-25 — 5-bosqich (batafsil profil UI/UX)
+- Rasm kichikroq, yumaloq (oval) + mint border
+- Ma’lumot / Ta’lim / Yutuqlar alohida yumaloq ramka-kartochkalarda
+- Hero kartochka, badge, yumaloq social tugmalar, soft reveal animatsiya
+- Template: `templates/core/person_detail.html` + `static/css/main.css`
+
 ## Keyingi ixtiyoriy
 
 - Haqiqiy foto yuklash (admin orqali JPG)
