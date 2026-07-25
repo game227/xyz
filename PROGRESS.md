@@ -62,6 +62,11 @@ Bu fayl loyihadagi UI va yangi funksiyalar bo‘yicha qilingan ishlarni doimiy y
 - O‘ngda ma’lumotlar 2px borderli yumaloq ramkalarda (sarlavha + body)
 - Template classlar: `.pd`, `.pd__aside`, `.pd__frame`
 
+### 2026-07-25 — saqlash
+- Backup papka: `/home/neo/Desktop/xyz_saqlangan_2026-07-25`
+- Asosiy loyiha: `/home/neo/Desktop/xyz` (git `8ad53e0`)
+- `runserver` to‘xtatildi (8000)
+
 ## Keyingi ixtiyoriy
 
 - Haqiqiy foto yuklash (admin orqali JPG)
