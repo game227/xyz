@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+            <p class="section-kicker mb-1">Dashboard</p>
+            <h1 class="h3 fw-bold mb-1">Salom, {{ user.first_name|default:user.username }}!</h1>
+            <p class="text-muted mb-0">Bugun ham bilim sari bir qadam qo‘ying.</p>
+        </div>
+        <a href="{% url 'core:rating' %}" class="btn btn-ghost btn-sm"><i class="bi bi-trophy"></i> Reyting</a>
+    </div>
+
+    {% if subscription and subscription.is_currently_active %}
+        <div class="alert alert-success small">
+            Obunangiz faol — {{ subscription.end_date|date:"d.m.Y" }} gacha amal qiladi.
+        </div>
+    {% else %}
+        <div class="alert alert-warning small d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>Faol obuna yo‘q. Bepul dars ixtiyoriy — to‘liq kontent uchun administrator bilan bog‘laning.</span>
+            <a href="{% url 'subscription:info' %}" class="btn btn-sm btn-primary">Obuna / kontakt</a>
+        </div>
+    {% endif %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="panel h-100 text-center reveal is-visible">
+                <div class="stat-number">{{ overall_progress }}%</div>
+                <p class="text-muted small mb-2 mt-2">Umumiy progress</p>
+                <div class="progress-ring"><span style="width: {{ overall_progress }}%"></span></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel h-100 text-center reveal is-visible" style="--delay:1">
+                <div class="stat-number">{{ completed_topics_count }}</div>
+                <p class="text-muted small mb-0 mt-2">Yakunlangan mavzular</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel h-100 text-center d-flex flex-column justify-content-center reveal is-visible" style="--delay:2">
+                {% if last_lesson %}
+                    <a href="{% url 'education:lesson_detail' last_lesson.pk %}" class="btn btn-primary">Davom ettirish</a>
+                    <p class="text-muted small mt-2 mb-0">{{ last_lesson.title|truncatechars:36 }}</p>
+                {% else %}
+                    <a href="{% url 'education:subject_list' %}" class="btn btn-primary">Fanlarga o‘tish</a>
+                    {% if free_lesson %}
+                        <p class="text-muted small mt-2 mb-0">
+                            <a href="{% url 'education:lesson_detail' free_lesson.pk %}">Ixtiyoriy bepul dars</a>
+                        </p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h5 fw-bold mb-3">Oxirgi test natijalari</h2>
+    <div class="panel p-0 overflow-hidden reveal is-visible">
+        <table class="table mb-0">
+            <thead>
+                <tr><th class="ps-3">Mavzu</th><th>Sana</th><th>Natija</th><th>Holat</th></tr>
+            </thead>
+            <tbody>
+            {% for attempt in recent_attempts %}
+                <tr>
+                    <td class="ps-3"><a href="{% url 'exam:exam_result' attempt.pk %}">{{ attempt.lesson.title|default:attempt.topic.title }}</a></td>
+                    <td>{{ attempt.created_at|date:"d.m.Y" }}</td>
+                    <td>{{ attempt.score }}%</td>
+                    <td>
+                        {% if attempt.is_passed %}<span class="free-badge">O‘tgan</span>
+                        {% else %}<span class="lock-badge">O‘tmagan</span>{% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-muted text-center py-4">Hali test topshirilmagan.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

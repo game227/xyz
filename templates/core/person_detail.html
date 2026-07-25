@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}
+{% if person_kind == 'founder' %}{{ person.full_name }}{% else %}{{ person.get_full_name|default:person.username }}{% endif %} — {{ SITE_NAME }}
+{% endblock %}
+{% block content %}
+<section class="section person-detail">
+    <div class="container person-detail__wrap">
+        <a class="person-detail__back" href="{% url 'core:home' %}#{{ back_anchor }}">← Ortga</a>
+
+        <div class="person-detail__hero">
+            <div class="person-detail__media">
+                {% if person_kind == 'founder' %}
+                    {% if person.photo %}
+                        <img src="{{ person.photo.url }}" alt="{{ person.full_name }}">
+                    {% else %}
+                        <div class="person-card__avatar" aria-hidden="true">{{ person.full_name|make_list|first }}</div>
+                    {% endif %}
+                {% else %}
+                    {% if person.avatar %}
+                        <img src="{{ person.avatar.url }}" alt="{{ person.get_full_name }}">
+                    {% else %}
+                        <div class="person-card__avatar person-card__avatar--moss" aria-hidden="true">
+                            {{ person.first_name|default:person.username|make_list|first }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div>
+                <p class="section-kicker">
+                    {% if person_kind == 'founder' %}Asoschi{% else %}O‘qituvchi{% endif %}
+                </p>
+                <h1 class="person-detail__name">
+                    {% if person_kind == 'founder' %}
+                        {{ person.full_name }}
+                    {% else %}
+                        {{ person.get_full_name|default:person.username }}
+                    {% endif %}
+                </h1>
+                <p class="person-detail__role">
+                    {% if person_kind == 'founder' %}
+                        {{ person.role_title }}
+                    {% else %}
+                        {{ person.specialty|default:"Matematika o‘qituvchisi" }}
+                    {% endif %}
+                </p>
+                <div class="person-card__links">
+                    {% if person.telegram %}
+                        <a href="https://t.me/{{ person.telegram|cut:'@' }}" target="_blank" rel="noopener" aria-label="Telegram">
+                            <i class="bi bi-telegram"></i>
+                        </a>
+                    {% endif %}
+                    {% if person_kind == 'founder' and person.linkedin_url %}
+                        <a href="{{ person.linkedin_url }}" target="_blank" rel="noopener" aria-label="LinkedIn">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                    {% endif %}
+                    {% if person_kind == 'founder' and person.email %}
+                        <a href="mailto:{{ person.email }}" aria-label="Email"><i class="bi bi-envelope"></i></a>
+                    {% elif person_kind == 'teacher' and person.email %}
+                        <a href="mailto:{{ person.email }}" aria-label="Email"><i class="bi bi-envelope"></i></a>
+                    {% endif %}
+                    {% if person_kind == 'teacher' and person.phone_number %}
+                        <a href="tel:{{ person.phone_number }}" aria-label="Telefon"><i class="bi bi-telephone"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if person.full_bio or person.bio %}
+        <div class="person-detail__block">
+            <h2>Ma'lumot</h2>
+            <p>{{ person.full_bio|default:person.bio|linebreaksbr }}</p>
+        </div>
+        {% endif %}
+
+        {% if person.education %}
+        <div class="person-detail__block">
+            <h2>Ta'lim</h2>
+            <p>{{ person.education }}</p>
+        </div>
+        {% endif %}
+
+        {% if person.achievements %}
+        <div class="person-detail__block">
+            <h2>Yutuqlar</h2>
+            <p>{{ person.achievements|linebreaksbr }}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

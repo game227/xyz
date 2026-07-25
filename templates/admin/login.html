@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
+{{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+{% if form.errors and not form.non_field_errors %}
+  <p class="errornote">Quyidagi xatolarni tuzating.</p>
+{% endif %}
+{% if form.non_field_errors %}
+  {% for error in form.non_field_errors %}
+    <p class="errornote">{{ error }}</p>
+  {% endfor %}
+{% endif %}
+
+<div class="xyz-login-card" id="content-main">
+  <p class="xyz-login-card__hint">
+    Faqat administratorlar uchun. Login va parolni kiriting.
+    Oddiy o‘qituvchi paneli: <a href="/teacher/">/teacher/</a>
+  </p>
+
+  {% if user.is_authenticated %}
+    <p class="errornote">
+      Siz <strong>{{ username }}</strong> sifatida kirdingiz, lekin bu sahifaga ruxsat yo‘q.
+      Boshqa akkaunt bilan kiring.
+    </p>
+  {% endif %}
+
+  <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+    <div class="form-row">
+      {{ form.username.errors }}
+      <label for="id_username">Login:</label>
+      {{ form.username }}
+    </div>
+    <div class="form-row">
+      {{ form.password.errors }}
+      <label for="id_password">Parol:</label>
+      {{ form.password }}
+      <input type="hidden" name="next" value="{{ next }}">
+    </div>
+    <div class="submit-row">
+      <input type="submit" value="Kirish">
+    </div>
+  </form>
+  <a class="xyz-login-back" href="/">← Saytga qaytish</a>
+</div>
+{% endblock %}

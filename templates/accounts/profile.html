@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Profil — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="profile-hero">
+    <div class="container profile-hero__inner">
+        <div class="profile-hero__identity reveal is-visible">
+            <div class="profile-hero__avatar">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}">
+                {% else %}
+                    <span>{{ user.first_name|default:user.username|make_list|first }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <p class="section-kicker mb-1">Profil</p>
+                <h1 class="profile-hero__name">{{ user.get_full_name|default:user.username }}</h1>
+                <p class="profile-hero__meta">
+                    @{{ user.username }} · {{ user.get_role_display }}
+                    {% if subscription and subscription.is_currently_active %}
+                        · <span class="free-badge">Obuna faol</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <div class="profile-hero__stats">
+            {% if my_rank %}
+            <div class="profile-stat reveal is-visible">
+                <div class="profile-stat__value">#{{ my_rank.rank }}</div>
+                <div class="profile-stat__label">Oylik reyting</div>
+            </div>
+            <div class="profile-stat reveal is-visible" style="--delay:1">
+                <div class="profile-stat__value">{{ my_rank.avg_score }}%</div>
+                <div class="profile-stat__label">O‘rtacha ball</div>
+            </div>
+            {% endif %}
+            {% if overall_progress is not None %}
+            <div class="profile-stat reveal is-visible" style="--delay:2">
+                <div class="profile-stat__value">{{ overall_progress }}%</div>
+                <div class="profile-stat__label">Progress</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div class="container profile-grid pb-5">
+    <div class="profile-main reveal is-visible">
+        <div class="panel panel-lift">
+            <h2 class="h5 fw-bold mb-1">Ma’lumotlarni tahrirlash</h2>
+            <p class="text-muted small mb-4">Rasm, ism va aloqa ma’lumotlarini yangilang.</p>
+            <form method="post" enctype="multipart/form-data" novalidate class="profile-form">
+                {% csrf_token %}
+                <div class="profile-form__avatar-row">
+                    <div class="profile-form__preview" id="avatarPreview">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="">
+                        {% else %}
+                            <span>{{ user.first_name|default:user.username|make_list|first }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <label class="form-label">{{ form.avatar.label }}</label>
+                        {% render_field form.avatar class="form-control" id="avatarInput" %}
+                        <p class="form-text mb-0">JPG yoki PNG, tavsiya: kvadrat rasm.</p>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.first_name.label }}</label>
+                        {% render_field form.first_name class="form-control" %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.last_name.label }}</label>
+                        {% render_field form.last_name class="form-control" %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.email.label }}</label>
+                        {% render_field form.email class="form-control" type="email" %}
+                        {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.phone_number.label }}</label>
+                        {% render_field form.phone_number class="form-control" placeholder="+998 90 123 45 67" %}
+                    </div>
+                    {% if user.can_manage_content %}
+                    <div class="col-12">
+                        <label class="form-label">{{ form.specialty.label }}</label>
+                        {% render_field form.specialty class="form-control" %}
+                    </div>
+                    {% endif %}
+                    <div class="col-12">
+                        <label class="form-label">{{ form.bio.label }}</label>
+                        {% render_field form.bio class="form-control" %}
+                    </div>
+                </div>
+                <div class="mt-4 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
+                    <a href="{% url 'core:rating' %}" class="btn btn-ghost">Reytingga o‘tish</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <aside class="profile-side">
+        <div class="panel reveal is-visible">
+            <h3 class="h6 fw-bold mb-3">Tezkor havolalar</h3>
+            <div class="profile-links">
+                {% if user.is_student or not user.can_manage_content %}
+                    <a href="{% url 'progress:dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <a href="{% url 'education:subject_list' %}"><i class="bi bi-book"></i> Fanlar</a>
+                    <a href="{% url 'core:rating' %}"><i class="bi bi-trophy"></i> Reyting</a>
+                    <a href="{% url 'subscription:info' %}"><i class="bi bi-credit-card"></i> Obuna</a>
+                {% else %}
+                    <a href="{% url 'teacher:dashboard' %}"><i class="bi bi-easel"></i> O‘qituvchi panel</a>
+                    <a href="{% url 'education:subject_list' %}"><i class="bi bi-book"></i> Fanlar</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if student_of_month %}
+        <div class="panel month-mini reveal is-visible" style="--delay:1">
+            <p class="section-kicker mb-2">Oy o‘quvchisi</p>
+            <div class="month-mini__row">
+                <div class="month-mini__avatar">
+                    {% if student_of_month.user.avatar %}
+                        <img src="{{ student_of_month.user.avatar.url }}" alt="">
+                    {% else %}
+                        <span>{{ student_of_month.user.first_name|default:student_of_month.user.username|make_list|first }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <strong>{{ student_of_month.user.get_full_name|default:student_of_month.user.username }}</strong>
+                    <p class="small text-muted mb-0">{{ student_of_month.highlight }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('avatarInput')?.addEventListener('change', function (e) {
+  const file = e.target.files && e.target.files[0];
+  const box = document.getElementById('avatarPreview');
+  if (!file || !box) return;
+  const url = URL.createObjectURL(file);
+  box.innerHTML = '<img src="' + url + '" alt="">';
+});
+</script>
+{% endblock %}

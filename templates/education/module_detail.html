@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ module.title }} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav class="small text-muted mb-3">
+        <a href="{% url 'education:subject_list' %}">Fanlar</a> /
+        <a href="{% url 'education:subject_detail' module.course.subject.pk %}">{{ module.course.subject.name }}</a> /
+        <a href="{% url 'education:course_detail' module.course.pk %}">{{ module.course.title }}</a> /
+        {{ module.title }}
+    </nav>
+    <h1 class="h3 fw-bold mb-4">{{ module.title }}</h1>
+    <div class="d-grid gap-2">
+        {% for topic in topics %}
+        <a href="{% url 'education:topic_detail' topic.pk %}" class="lesson-row">
+            <span>
+                {{ topic.title }}
+                {% if free_topic and topic.id == free_topic.id and not has_subscription %}
+                    <span class="free-badge ms-2">Bepul</span>
+                {% endif %}
+            </span>
+            <span class="text-muted small">{{ topic.lessons.count }} video</span>
+        </a>
+        {% empty %}
+        <p class="text-muted">Bu modulda hozircha mavzular yo‘q.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

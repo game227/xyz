@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}{{ title }} — O‘qituvchi{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="panel" style="max-width:720px">
+        <h1 class="h4 fw-bold mb-3">{{ title }}</h1>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                        <div class="form-check">{{ field }} <label class="form-check-label">{{ field.label }}</label></div>
+                    {% else %}
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                    {% endif %}
+                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+            <a href="{% url 'teacher:topic_list' %}" class="btn btn-ghost">Bekor</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

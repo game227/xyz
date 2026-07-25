@@ -1,0 +1,113 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static log %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <section class="xyz-dash-hero" aria-label="Tezkor yo‘riqnoma">
+    <div>
+      <h2 class="xyz-dash-hero__title">XYZ boshqaruv paneli</h2>
+      <p class="xyz-dash-hero__lead">
+        Bu yerda saytning barcha ma’lumotlari boshqariladi.
+        Eng ko‘p ishlatiladigan bo‘limlar pastda — <strong>bosib oching</strong>.
+        O‘qituvchi uchun alohida panel:
+        <a href="/teacher/" style="color:#3be0a8;font-weight:700">/teacher/</a>
+      </p>
+    </div>
+    <div class="xyz-quick-grid">
+      <a class="xyz-quick-card" href="{% url 'admin:accounts_customuser_changelist' %}">
+        <span class="xyz-quick-card__icon">01</span>
+        <span class="xyz-quick-card__label">Foydalanuvchilar</span>
+        <span class="xyz-quick-card__hint">Rol, avatar, obuna berish</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:subscription_subscription_changelist' %}">
+        <span class="xyz-quick-card__icon">02</span>
+        <span class="xyz-quick-card__label">Obunalar</span>
+        <span class="xyz-quick-card__hint">Kimga qancha kun berilgan</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:education_subject_changelist' %}">
+        <span class="xyz-quick-card__icon">03</span>
+        <span class="xyz-quick-card__label">Fanlar</span>
+        <span class="xyz-quick-card__hint">Kurs → Modul → Mavzu</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:education_lesson_changelist' %}">
+        <span class="xyz-quick-card__icon">04</span>
+        <span class="xyz-quick-card__label">Video darslar</span>
+        <span class="xyz-quick-card__hint">Har video = 10 savol</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:exam_question_changelist' %}">
+        <span class="xyz-quick-card__icon">05</span>
+        <span class="xyz-quick-card__label">Savollar</span>
+        <span class="xyz-quick-card__hint">Test savollarini qo‘shish</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:subscription_contactchannel_changelist' %}">
+        <span class="xyz-quick-card__icon">06</span>
+        <span class="xyz-quick-card__label">Kontaktlar</span>
+        <span class="xyz-quick-card__hint">Telegram, telefon, email</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:core_founder_changelist' %}">
+        <span class="xyz-quick-card__icon">07</span>
+        <span class="xyz-quick-card__label">Asoschilar</span>
+        <span class="xyz-quick-card__hint">Bosh sahifa kartochkalari</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:core_studentofthemonth_changelist' %}">
+        <span class="xyz-quick-card__icon">08</span>
+        <span class="xyz-quick-card__label">Oy o‘quvchisi</span>
+        <span class="xyz-quick-card__hint">Reyting banneri</span>
+      </a>
+    </div>
+  </section>
+
+  <aside class="xyz-help-panel">
+    <h2>Qanday ishlaydi? (qisqa)</h2>
+    <ol>
+      <li><strong>Kontent:</strong> Fan → Kurs → Modul → Mavzu → Video dars qo‘shing.</li>
+      <li><strong>Test:</strong> Har bir video uchun 10 ta savol qo‘shing (Savollar bo‘limi).</li>
+      <li><strong>Obuna:</strong> Foydalanuvchilar ro‘yxatida tanlang → yuqoridagi “30/90/180 kunlik obuna” amali.</li>
+      <li><strong>Bosh sahifa:</strong> Asoschilar va o‘qituvchi avatarlarini shu yerdan yangilang.</li>
+    </ol>
+  </aside>
+
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+  <div class="module" id="recent-actions-module">
+    <h2>So‘nggi amallar</h2>
+    <h3>Sizning ishlaringiz</h3>
+    {% get_admin_log 12 as admin_log for_user user %}
+    {% if not admin_log %}
+      <p>Hali amallar yo‘q.</p>
+    {% else %}
+      <ul class="actionlist">
+        {% for entry in admin_log %}
+          <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+            {% if entry.is_deletion or not entry.get_admin_url %}
+              {{ entry.object_repr }}
+            {% else %}
+              <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+            {% endif %}
+            <br>
+            {% if entry.content_type %}
+              <span class="mini quiet">{{ entry.content_type.name|capfirst }}</span>
+            {% else %}
+              <span class="mini quiet">Noma’lum</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

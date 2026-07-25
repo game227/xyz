@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} — O‘qituvchi{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav class="small text-muted mb-2">
+        <a href="{% url 'teacher:dashboard' %}">Kabinet</a> /
+        <a href="{% url 'teacher:lesson_list' %}">Videolar</a> /
+        <a href="{% url 'teacher:topic_detail' lesson.topic_id %}">{{ lesson.topic.title }}</a> /
+        {{ lesson.title }}
+    </nav>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+        <div>
+            <h1 class="h3 fw-bold mb-1">{{ lesson.title }}</h1>
+            <p class="text-muted mb-0">{{ lesson.topic.module.course.subject.name }} · {{ lesson.duration_minutes }} daq</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'teacher:lesson_edit' lesson.pk %}" class="btn btn-ghost btn-sm">Tahrirlash</a>
+            <form method="post" action="{% url 'teacher:lesson_delete' lesson.pk %}" onsubmit="return confirm('Video o‘chirilsinmi?');">
+                {% csrf_token %}
+                <button class="btn btn-outline-danger btn-sm">O‘chirish</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel mb-4">
+        <strong>Test to‘plami:</strong>
+        {% if ready %}
+            <span class="free-badge ms-2">Tayyor — {{ valid_count }}/{{ questions_per_lesson }}</span>
+        {% else %}
+            <span class="lock-badge ms-2">{{ valid_count }}/{{ questions_per_lesson }} (to‘liq savollar)</span>
+        {% endif %}
+        <p class="text-muted small mb-0 mt-2">Har bir video uchun aniq {{ questions_per_lesson }} ta savol — chalkashlik bo‘lmasligi uchun.</p>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 fw-bold mb-0">Savollar</h2>
+        {% if questions.count < questions_per_lesson %}
+            <a href="{% url 'teacher:question_create' lesson.pk %}" class="btn btn-primary btn-sm">+ Savol</a>
+        {% endif %}
+    </div>
+
+    {% for question in questions %}
+        <div class="lesson-row">
+            <span>
+                {% if question.has_valid_answers %}<i class="bi bi-check-circle-fill text-success me-1"></i>
+                {% else %}<i class="bi bi-exclamation-circle text-warning me-1"></i>{% endif %}
+                {{ question.text|truncatechars:90 }}
+            </span>
+            <span class="d-flex gap-2">
+                <a href="{% url 'teacher:question_edit' question.pk %}" class="btn btn-sm btn-ghost">Tahrir</a>
+                <form method="post" action="{% url 'teacher:question_delete' question.pk %}" onsubmit="return confirm('O‘chirilsinmi?');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger">O‘chirish</button>
+                </form>
+            </span>
+        </div>
+    {% empty %}
+        <p class="text-muted">Hali savol yo‘q. {{ questions_per_lesson }} ta qo‘shing.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Mavzular — O‘qituvchi{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-2 flex-wrap">
+        <h1 class="h3 fw-bold mb-0">Mavzular</h1>
+        <a href="{% url 'teacher:topic_create' %}" class="btn btn-primary">Yangi mavzu</a>
+    </div>
+    {% for topic in topics %}
+        <a href="{% url 'teacher:topic_detail' topic.pk %}" class="lesson-row">
+            <span>
+                <strong>{{ topic.title }}</strong>
+                <span class="text-muted small d-block">
+                    {{ topic.module.course.subject.name }} / {{ topic.module.course.title }} / {{ topic.module.title }}
+                </span>
+            </span>
+            <span class="text-muted small">{{ topic.lesson_count }} video · {{ topic.question_count }} savol</span>
+        </a>
+    {% empty %}
+        <p class="text-muted">Mavzular yo‘q.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ SITE_NAME }} — Universitetga tayyorlanish{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="hero__orb hero__orb--a" aria-hidden="true"></div>
+    <div class="hero__orb hero__orb--b" aria-hidden="true"></div>
+    <div class="container hero__content">
+        <p class="hero__brand">{{ SITE_NAME }}</p>
+        <h1 class="hero__title">Matematika bo‘yicha aniq tayyorgarlik</h1>
+        <p class="hero__lead">Video darslar, 10 talik testlar va reyting — bitta joyda. Avval jamoani bilib oling, keyin o‘qing.</p>
+        <div class="hero__actions">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">Ro‘yxatdan o‘tish</a>
+                <a href="#asoschilar" class="btn btn-ghost btn-lg">Asoschilar</a>
+            {% else %}
+                <a href="{% url 'education:subject_list' %}" class="btn btn-primary btn-lg">Fanlarga o‘tish</a>
+                <a href="{% url 'accounts:profile' %}" class="btn btn-ghost btn-lg">Profil</a>
+            {% endif %}
+        </div>
+        <nav class="hero__jump" aria-label="Bo‘limlar">
+            <a href="#asoschilar">Asoschilar</a>
+            <a href="#oqituvchilar">O‘qituvchilar</a>
+            <a href="#oy-oquvchisi">Oy o‘quvchisi</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'core:rating' %}">Reyting</a>
+            {% endif %}
+        </nav>
+    </div>
+</section>
+
+{# ——— 1. Asoschilar ——— #}
+<section class="section people-section" id="asoschilar">
+    <div class="container">
+        <p class="section-kicker reveal">Jamoa</p>
+        <h2 class="section-title reveal">Asoschilar</h2>
+        <p class="section-lead reveal">Platformani yaratgan odamlar — ro‘yxatdan oldin kim ekanligimizni biling.</p>
+        {% if founders %}
+        <div class="people-grid">
+            {% for f in founders %}
+            <a href="{% url 'core:founder_detail' f.pk %}" class="person-card person-card--link reveal" style="--delay: {{ forloop.counter0 }}">
+                <div class="person-card__media">
+                    {% if f.photo %}
+                        <img src="{{ f.photo.url }}" alt="{{ f.full_name }}" loading="lazy">
+                    {% else %}
+                        <div class="person-card__avatar" aria-hidden="true">{{ f.full_name|make_list|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="person-card__body">
+                    <h3 class="person-card__name">{{ f.full_name }}</h3>
+                    <p class="person-card__role">{{ f.role_title }}</p>
+                    {% if f.bio %}<p class="person-card__bio">{{ f.bio|truncatewords:18 }}</p>{% endif %}
+                    <span class="person-card__more">Batafsil →</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="text-muted reveal">Asoschilar tez orada qo‘shiladi.</p>
+        {% endif %}
+    </div>
+</section>
+
+{# ——— 2. O‘qituvchilar ——— #}
+<section class="section people-section people-section--alt" id="oqituvchilar">
+    <div class="container">
+        <p class="section-kicker reveal">Mentorlar</p>
+        <h2 class="section-title reveal">O‘qituvchilar</h2>
+        <p class="section-lead reveal">Darslarni tayyorlaydigan va sizni imtihonga olib boradigan murabbiylar.</p>
+        {% if teachers %}
+        <div class="people-grid">
+            {% for t in teachers %}
+            <a href="{% url 'core:teacher_detail' t.pk %}" class="person-card person-card--teacher person-card--link reveal" style="--delay: {{ forloop.counter0 }}">
+                <div class="person-card__media">
+                    {% if t.avatar %}
+                        <img src="{{ t.avatar.url }}" alt="{{ t.get_full_name }}" loading="lazy">
+                    {% else %}
+                        <div class="person-card__avatar person-card__avatar--moss" aria-hidden="true">
+                            {{ t.first_name|default:t.username|make_list|first }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="person-card__body">
+                    <h3 class="person-card__name">{{ t.get_full_name|default:t.username }}</h3>
+                    <p class="person-card__role">{{ t.specialty|default:"Matematika o‘qituvchisi" }}</p>
+                    {% if t.bio %}<p class="person-card__bio">{{ t.bio|truncatewords:18 }}</p>{% endif %}
+                    <span class="person-card__more">Batafsil →</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="text-muted reveal">O‘qituvchilar tez orada qo‘shiladi.</p>
+        {% endif %}
+    </div>
+</section>
+
+{# ——— 3. Oy o‘quvchisi + reyting ——— #}
+<section class="section" id="oy-oquvchisi">
+    <div class="container">
+        <p class="section-kicker reveal">Natija</p>
+        <h2 class="section-title reveal">Oy o‘quvchisi</h2>
+        <p class="section-lead reveal">Bu oyning eng yaxshi natijasi — rag‘bat va raqobat bir joyda.</p>
+
+        <div class="month-layout">
+            <div class="month-hero reveal">
+                {% if student_of_month %}
+                    <div class="month-hero__badge"><i class="bi bi-trophy"></i> {{ rating_month }}/{{ rating_year }}</div>
+                    <div class="month-hero__avatar">
+                        {% if student_of_month.user.avatar %}
+                            <img src="{{ student_of_month.user.avatar.url }}" alt="">
+                        {% else %}
+                            <span>{{ student_of_month.user.first_name|default:student_of_month.user.username|make_list|first }}</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="month-hero__name">{{ student_of_month.user.get_full_name|default:student_of_month.user.username }}</h3>
+                    <p class="month-hero__note">{{ student_of_month.highlight }}</p>
+                {% else %}
+                    <div class="month-hero__badge"><i class="bi bi-hourglass"></i> Tez orada</div>
+                    <h3 class="month-hero__name">Hali e’lon qilinmagan</h3>
+                    <p class="month-hero__note">Test topshiring — reytingda paydo bo‘ling.</p>
+                {% endif %}
+            </div>
+
+            <div class="rating-panel reveal">
+                <div class="rating-panel__head">
+                    <h3>Oylik reyting</h3>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'core:rating' %}">To‘liq ro‘yxat <i class="bi bi-arrow-right"></i></a>
+                    {% endif %}
+                </div>
+                {% if user.is_authenticated %}
+                    {% if leaderboard %}
+                    <ol class="rating-list">
+                        {% for row in leaderboard %}
+                        <li class="rating-list__item {% if forloop.first %}is-top{% endif %}">
+                            <span class="rating-list__rank">{{ row.rank }}</span>
+                            <span class="rating-list__avatar">
+                                {% if row.user.avatar %}
+                                    <img src="{{ row.user.avatar.url }}" alt="">
+                                {% else %}
+                                    <span>{{ row.user.first_name|default:row.user.username|make_list|first }}</span>
+                                {% endif %}
+                            </span>
+                            <span class="rating-list__who">
+                                <strong>{{ row.user.get_full_name|default:row.user.username }}</strong>
+                                <small>{{ row.attempts }} ta test</small>
+                            </span>
+                            <span class="rating-list__score">{{ row.avg_score }}%</span>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                    {% else %}
+                        <p class="text-muted mb-0">Bu oyda hali natija yo‘q.</p>
+                    {% endif %}
+                {% else %}
+                    <div class="rating-lock">
+                        <i class="bi bi-lock-fill"></i>
+                        <p class="mb-3">Reyting faqat tizimga kirgan foydalanuvchilar uchun.</p>
+                        <a href="{% url 'accounts:login' %}?next={% url 'core:rating' %}" class="btn btn-primary btn-sm">Kirish</a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-ghost btn-sm">Ro‘yxatdan o‘tish</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0">
+    <div class="container">
+        <h2 class="section-title reveal">Nima uchun {{ SITE_NAME }}?</h2>
+        <p class="section-lead reveal">Aniq dastur, har video uchun alohida test, shaffof progress.</p>
+        <div class="feature-strip">
+            <article class="feature-item reveal">
+                <div class="feature-item__icon"><i class="bi bi-diagram-3"></i></div>
+                <h3>Tizimli dastur</h3>
+                <p>Kurs → Modul → Mavzu → Video. Bosqichma-bosqich tayyorgarlik.</p>
+            </article>
+            <article class="feature-item reveal" style="--delay: 1">
+                <div class="feature-item__icon"><i class="bi bi-shuffle"></i></div>
+                <h3>10 talik testlar</h3>
+                <p>Har video o‘z testiga ega. Savollar va javoblar random tartibda.</p>
+            </article>
+            <article class="feature-item reveal" style="--delay: 2">
+                <div class="feature-item__icon"><i class="bi bi-bar-chart"></i></div>
+                <h3>Jonli reyting</h3>
+                <p>Natijangiz oylik jadvalda ko‘rinadi — oy o‘quvchisi bo‘lish imkoni ochiq.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+{% if subjects %}
+<section class="section pt-0">
+    <div class="container">
+        <h2 class="section-title reveal">Yo‘nalishlar</h2>
+        <p class="section-lead reveal">Hozirgi ochiq fanlar.</p>
+        <div class="subject-rail">
+            {% for subject in subjects %}
+            <a href="{% if user.is_authenticated %}{% url 'education:subject_detail' subject.pk %}{% else %}{% url 'accounts:login' %}{% endif %}" class="subject-tile reveal" style="--delay: {{ forloop.counter0 }}">
+                <div class="subject-tile__index">0{{ forloop.counter }}</div>
+                <h3 class="h5 mt-2 mb-2">{{ subject.name }}</h3>
+                <p class="mb-0 text-muted small">{{ subject.description|truncatewords:18 }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="section pt-0">
+    <div class="container">
+        <div class="panel panel-muted stats-band reveal">
+            <div class="row g-4 text-center text-md-start align-items-center">
+                <div class="col-md-4">
+                    <div class="stat-number" data-count="{{ stats.subjects_count }}">0</div>
+                    <div class="text-muted mt-2">Faol fan</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-number" data-count="{{ stats.teachers_count|default:0 }}">0</div>
+                    <div class="text-muted mt-2">O‘qituvchi</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-number" data-count="{{ stats.founders_count|default:0 }}">0</div>
+                    <div class="text-muted mt-2">Asoschi</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0">
+    <div class="container">
+        <h2 class="section-title reveal">Savollar</h2>
+        <details class="faq-item reveal" open>
+            <summary>Bepul darsni ko‘rish shartmi?</summary>
+            <p>Yo‘q. Bepul dars ixtiyoriy sinov. Xohlasangiz sinab ko‘ring, xohlamasangiz administrator orqali obuna oling.</p>
+        </details>
+        <details class="faq-item reveal">
+            <summary>Reyting qanday hisoblanadi?</summary>
+            <p>Joriy oydagi testlarning o‘rtacha foizi. Reytingni faqat tizimga kirgan foydalanuvchilar ko‘radi. Eng yuqori natija — oy o‘quvchisi (yoki admin belgilagan o‘quvchi).</p>
+        </details>
+        <details class="faq-item reveal">
+            <summary>Qolgan kontent qachon ochiladi?</summary>
+            <p>Faol obuna kerak. Obunani administrator faollashtiradi — kontaktlar Obuna sahifasida.</p>
+        </details>
+    </div>
+</section>
+
+<section class="section pt-0" id="contact">
+    <div class="container">
+        <div class="panel panel-lift reveal">
+            <h2 class="h4 mb-2">Bog‘lanish</h2>
+            <p class="text-muted mb-3">Administrator kontaktlari admin panel orqali yangilanadi.</p>
+            {% if contacts %}
+                <div class="contact-list contact-list--light">
+                    {% for c in contacts %}
+                        {% if c.href %}
+                            <a class="contact-chip contact-chip--light" href="{{ c.href }}" target="_blank" rel="noopener">
+                                <i class="bi {{ c.bootstrap_icon }}"></i>
+                                <span><strong>{{ c.label }}</strong><small>{{ c.value }}</small></span>
+                            </a>
+                        {% else %}
+                            <div class="contact-chip contact-chip--light">
+                                <i class="bi {{ c.bootstrap_icon }}"></i>
+                                <span><strong>{{ c.label }}</strong><small>{{ c.value }}</small></span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="mb-0 text-muted">Hozircha kontakt kiritilmagan.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% if not user.is_authenticated %}
+<section class="section pt-0">
+    <div class="container">
+        <div class="cta-band reveal">
+            <div>
+                <h2 class="h3 mb-2">Tayyormisiz?</h2>
+                <p class="mb-0 opacity-75">Jamoani ko‘rdingiz — endi o‘zingizning o‘rningizni egallang.</p>
+            </div>
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">Ro‘yxatdan o‘tish</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:"XYZ Admin" }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/xyz_admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div class="xyz-admin-mark" aria-hidden="true">XYZ</div>
+<div>
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{{ site_header|default:"XYZ Boshqaruv" }}</a>
+  </h1>
+  <span class="xyz-admin-tagline">Oddiy boshqaruv paneli — kontent, obuna, foydalanuvchilar</span>
+</div>
+{% endblock %}
+
+{% block welcome-msg %}
+Salom,
+<strong>{% firstof user.get_short_name user.get_username %}</strong>.
+{% endblock %}
+
+{% block userlinks %}
+  {% if site_url %}
+    <a href="{{ site_url }}">Saytga qaytish</a> /
+  {% endif %}
+  {% if user.has_usable_password %}
+    <a href="{% url 'admin:password_change' %}">Parolni almashtirish</a> /
+  {% endif %}
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% csrf_token %}
+    <button type="submit">Chiqish</button>
+  </form>
+  {% include "admin/color_theme_toggle.html" %}
+{% endblock %}

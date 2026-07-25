@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Reyting — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+        <div>
+            <p class="section-kicker mb-1">Natijalar</p>
+            <h1 class="section-title mb-1">Reyting</h1>
+            <p class="section-lead mb-0">
+                {% if period == 'month' and rating_month %}
+                    {{ rating_month }}/{{ rating_year }} oyi bo‘yicha o‘rtacha ball
+                {% else %}
+                    Barcha vaqt bo‘yicha o‘rtacha ball
+                {% endif %}
+            </p>
+        </div>
+        <div class="period-switch">
+            <a href="?period=month" class="period-switch__btn {% if period == 'month' %}is-active{% endif %}">Bu oy</a>
+            <a href="?period=all" class="period-switch__btn {% if period == 'all' %}is-active{% endif %}">Hammasi</a>
+        </div>
+    </div>
+
+    {% if student_of_month and period == 'month' %}
+    <article class="sotm-banner reveal is-visible mb-4">
+        <div class="sotm-banner__photo">
+            {% if student_of_month.user.avatar %}
+                <img src="{{ student_of_month.user.avatar.url }}" alt="{{ student_of_month.user.get_full_name }}">
+            {% else %}
+                <span>{{ student_of_month.user.first_name|default:student_of_month.user.username|make_list|first }}</span>
+            {% endif %}
+        </div>
+        <div class="sotm-banner__body">
+            <div class="sotm-banner__badge"><i class="bi bi-trophy-fill"></i> Oy o‘quvchisi · 1-o‘rin</div>
+            <h2 class="sotm-banner__name">{{ student_of_month.user.get_full_name|default:student_of_month.user.username }}</h2>
+            <p class="sotm-banner__note mb-0">{{ student_of_month.highlight }}</p>
+            {% if student_of_month.stats %}
+                <p class="sotm-banner__stats mb-0">
+                    O‘rtacha {{ student_of_month.stats.avg_score }}% · {{ student_of_month.stats.attempts }} ta test
+                </p>
+            {% endif %}
+        </div>
+    </article>
+    {% endif %}
+
+    <div class="rating-panel reveal is-visible">
+        {% if leaderboard %}
+        <ol class="rating-list rating-list--full">
+            {% for row in leaderboard %}
+            <li class="rating-list__item {% if forloop.first %}is-top{% endif %}{% if student_of_month and row.user.id == student_of_month.user.id %} is-sotm{% endif %}">
+                <span class="rating-list__rank">{{ row.rank }}</span>
+                <span class="rating-list__avatar">
+                    {% if row.user.avatar %}
+                        <img src="{{ row.user.avatar.url }}" alt="">
+                    {% else %}
+                        <span>{{ row.user.first_name|default:row.user.username|make_list|first }}</span>
+                    {% endif %}
+                </span>
+                <span class="rating-list__who">
+                    <strong>{{ row.user.get_full_name|default:row.user.username }}</strong>
+                    <small>{{ row.attempts }} urinish · {{ row.passed }} o‘tgan · eng yaxshi {{ row.best_score }}%</small>
+                </span>
+                <span class="rating-list__score">{{ row.avg_score }}%</span>
+            </li>
+            {% endfor %}
+        </ol>
+        {% else %}
+            <p class="text-muted text-center py-5 mb-0">Hali reyting uchun natija yo‘q. Test topshiring!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

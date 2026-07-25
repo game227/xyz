@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — O‘qituvchi{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:720px">
+    {% if topic %}
+    <nav class="small text-muted mb-2">
+        <a href="{% url 'teacher:topic_detail' topic.pk %}">{{ topic.title }}</a>
+    </nav>
+    {% endif %}
+    <h1 class="h4 fw-bold mb-3">{{ title }}</h1>
+    <form method="post" enctype="multipart/form-data" class="panel">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                {% if field.field.widget.input_type == 'checkbox' or field.name == 'is_active' %}
+                    <div class="form-check">{{ field }} <label class="form-check-label">{{ field.label }}</label></div>
+                {% else %}
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.name == 'video' and lesson and lesson.video %}
+                        <div class="form-text">Joriy: {{ lesson.video.name }}</div>
+                    {% endif %}
+                {% endif %}
+                {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+        {% endfor %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+        <button class="btn btn-primary" type="submit">Saqlash</button>
+        <a class="btn btn-ghost" href="{% if lesson %}{% url 'teacher:lesson_detail' lesson.pk %}{% elif topic %}{% url 'teacher:topic_detail' topic.pk %}{% else %}{% url 'teacher:lesson_list' %}{% endif %}">Orqaga</a>
+    </form>
+</div>
+{% endblock %}

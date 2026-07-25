@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ topic.title }} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav class="small text-muted mb-3">
+        <a href="{% url 'education:subject_list' %}">Fanlar</a> /
+        <a href="{% url 'education:subject_detail' topic.module.course.subject.pk %}">{{ topic.module.course.subject.name }}</a> /
+        <a href="{% url 'education:course_detail' topic.module.course.pk %}">{{ topic.module.course.title }}</a> /
+        <a href="{% url 'education:module_detail' topic.module.pk %}">{{ topic.module.title }}</a> /
+        {{ topic.title }}
+    </nav>
+
+    <h1 class="h3 fw-bold mb-2">{{ topic.title }}</h1>
+    <p class="text-muted">{{ topic.description }}</p>
+    <p class="small text-muted">Har bir video o‘zining 10 talik testiga ega.</p>
+
+    <h2 class="h5 fw-bold mt-4 mb-3">Video darslar</h2>
+    {% for item in lesson_items %}
+        {% if item.accessible %}
+            <div class="lesson-row">
+                <a href="{% url 'education:lesson_detail' item.lesson.pk %}" class="text-decoration-none text-dark flex-grow-1">
+                    {% if item.completed %}<i class="bi bi-check-circle-fill text-success me-2"></i>
+                    {% else %}<i class="bi bi-play-circle me-2 text-muted"></i>{% endif %}
+                    {{ item.lesson.title }}
+                    {% if item.is_free %}<span class="free-badge ms-2">Bepul</span>{% endif %}
+                    {% if item.exam_passed %}<span class="free-badge ms-2">Test ✓</span>{% endif %}
+                </a>
+                <span class="d-flex align-items-center gap-2">
+                    <span class="text-muted small">{{ item.lesson.duration_minutes }} daq</span>
+                    {% if item.can_start_test %}
+                        <a href="{% url 'exam:exam_start' item.lesson.pk %}" class="btn btn-sm btn-primary">Test</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% else %}
+            <a href="{% url 'subscription:info' %}" class="lesson-row is-locked">
+                <span>
+                    <i class="bi bi-lock-fill me-2 text-muted"></i>
+                    {{ item.lesson.title }}
+                    <span class="lock-badge ms-2">Obuna</span>
+                </span>
+                <span class="text-muted small">{{ item.lesson.duration_minutes }} daq</span>
+            </a>
+        {% endif %}
+    {% empty %}
+        <p class="text-muted">Bu mavzuda hozircha video darslar yo‘q.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Obuna — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-7">
+            <div class="panel panel-lift">
+                <p class="eyebrow mb-2">Obuna</p>
+                <h1 class="h3 fw-bold mb-3">Obuna holati</h1>
+
+                {% if subscription %}
+                    <p class="mb-2">
+                        Holat:
+                        {% if subscription.is_currently_active %}
+                            <span class="free-badge">Faol</span>
+                        {% else %}
+                            <span class="lock-badge">Muddati tugagan</span>
+                        {% endif %}
+                    </p>
+                    <p class="text-muted mb-1">Boshlanish: {{ subscription.start_date|date:"d.m.Y" }}</p>
+                    <p class="text-muted mb-0">Tugash: {{ subscription.end_date|date:"d.m.Y" }}</p>
+                {% else %}
+                    <p class="text-muted mb-0">Hozircha faol obuna yo‘q. To‘liq dasturga kirish uchun administrator bilan bog‘laning.</p>
+                {% endif %}
+            </div>
+
+            <div class="panel panel-lift mt-3">
+                <h2 class="h6 fw-bold mb-2">Ixtiyoriy bepul sinov</h2>
+                <p class="text-muted mb-3">
+                    Xohlasangiz, birinchi video va uning 10 talik testini <strong>bepul</strong> sinab ko‘rishingiz mumkin.
+                    Bu majburiy emas — to‘g‘ridan-to‘g‘ri obuna ham olishingiz mumkin.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if free_lesson %}
+                        <a href="{% url 'education:lesson_detail' free_lesson.pk %}" class="btn btn-ghost">Ixtiyoriy bepul dars</a>
+                    {% endif %}
+                    <a href="{% url 'education:subject_list' %}" class="btn btn-ghost">Fanlar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="panel panel-dark contact-panel h-100">
+                <h2 class="h5 fw-bold mb-2">Administrator bilan bog‘lanish</h2>
+                <p class="contact-panel__lead mb-3">Obunani faollashtirish uchun quyidagi kontaktlar orqali yozing.</p>
+                {% if contacts %}
+                    <div class="contact-list">
+                        {% for c in contacts %}
+                            {% if c.href %}
+                                <a class="contact-chip" href="{{ c.href }}" target="_blank" rel="noopener">
+                                    <i class="bi {{ c.bootstrap_icon }}"></i>
+                                    <span>
+                                        <strong>{{ c.label }}</strong>
+                                        <small>{{ c.value }}</small>
+                                    </span>
+                                </a>
+                            {% else %}
+                                <div class="contact-chip">
+                                    <i class="bi {{ c.bootstrap_icon }}"></i>
+                                    <span>
+                                        <strong>{{ c.label }}</strong>
+                                        <small>{{ c.value }}</small>
+                                    </span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="mb-0 opacity-75">Kontaktlar hali kiritilmagan. Admin paneldan qo‘shiladi.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

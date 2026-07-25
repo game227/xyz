@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Ro‘yxatdan o‘tish — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-shell container">
+    <div class="auth-panel" style="width:min(100%,520px)">
+        <div class="text-center mb-4">
+            <div class="brand-mark justify-content-center mb-2">
+                <span class="brand-mark__glyph">X</span> {{ SITE_NAME }}
+            </div>
+            <h1 class="h4 fw-bold mb-1">Ro‘yxatdan o‘tish</h1>
+            <p class="text-muted small mb-0">Birinchi dars va test bepul ochiladi</p>
+        </div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-2">
+                <div class="col-6 mb-3">
+                    <label class="form-label">{{ form.first_name.label }}</label>
+                    {% render_field form.first_name class="form-control" required="required" %}
+                    {% for error in form.first_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="form-label">{{ form.last_name.label }}</label>
+                    {% render_field form.last_name class="form-control" required="required" %}
+                    {% for error in form.last_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Login</label>
+                {% render_field form.username class="form-control" required="required" %}
+                {% for error in form.username.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.email.label }}</label>
+                {% render_field form.email class="form-control" type="email" required="required" %}
+                {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Parol</label>
+                {% render_field form.password1 class="form-control" required="required" %}
+                {% for error in form.password1.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Parolni tasdiqlang</label>
+                {% render_field form.password2 class="form-control" required="required" %}
+                {% for error in form.password2.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary w-100">Ro‘yxatdan o‘tish</button>
+        </form>
+        <p class="text-center text-muted small mt-4 mb-0">
+            Hisobingiz bormi? <a href="{% url 'accounts:login' %}">Kirish</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

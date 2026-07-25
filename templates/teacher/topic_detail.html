@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ topic.title }} — O‘qituvchi{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav class="small text-muted mb-2">
+        <a href="{% url 'teacher:dashboard' %}">Kabinet</a> /
+        <a href="{% url 'teacher:topic_list' %}">Mavzular</a> /
+        {{ topic.title }}
+    </nav>
+    <h1 class="h3 fw-bold mb-1">{{ topic.title }}</h1>
+    <p class="text-muted">
+        {{ topic.module.course.subject.name }} · {{ topic.module.course.title }} · {{ topic.module.title }}
+    </p>
+
+    <div class="panel mb-4">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div>
+                <strong>Mavzu test sozlamalari</strong>
+                <div class="text-muted small">
+                    Har video: {{ questions_per_lesson }} savol · {{ settings.passing_score }}% o‘tish
+                    {% if settings.time_limit_minutes %} · {{ settings.time_limit_minutes }} daq{% endif %}
+                </div>
+            </div>
+            <a href="{% url 'teacher:exam_settings' topic.pk %}" class="btn btn-ghost btn-sm">Sozlash</a>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 fw-bold mb-0">Video darslar</h2>
+        <a href="{% url 'teacher:lesson_create_for_topic' topic.pk %}" class="btn btn-primary btn-sm">+ Video</a>
+    </div>
+    {% for row in lesson_rows %}
+        <a href="{% url 'teacher:lesson_detail' row.lesson.pk %}" class="lesson-row">
+            <span>
+                {% if row.lesson.is_active %}<span class="free-badge">Faol</span>{% else %}<span class="lock-badge">Nofaol</span>{% endif %}
+                {{ row.lesson.title }}
+                <span class="text-muted small">({{ row.lesson.duration_minutes }} daq)</span>
+            </span>
+            <span class="text-muted small">
+                {% if row.ready %}
+                    <span class="free-badge">{{ row.valid_count }}/{{ questions_per_lesson }} test</span>
+                {% else %}
+                    <span class="lock-badge">{{ row.valid_count }}/{{ questions_per_lesson }}</span>
+                {% endif %}
+            </span>
+        </a>
+    {% empty %}
+        <p class="text-muted mb-4">Video yo‘q.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — O‘qituvchi{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:820px">
+    <nav class="small text-muted mb-2">
+        <a href="{% url 'teacher:lesson_detail' lesson.pk %}">{{ lesson.title }}</a>
+    </nav>
+    <h1 class="h4 fw-bold mb-3">{{ title }}</h1>
+    <form method="post" class="panel">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                {% if field.name == 'is_active' %}
+                    <div class="form-check">{{ field }} <label class="form-check-label">{{ field.label }}</label></div>
+                {% else %}
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                {% endif %}
+                {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+        {% endfor %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+        <h2 class="h6 fw-bold mt-4">Javoblar (kamida 4, aynan 1 to‘g‘ri)</h2>
+        {{ formset.management_form }}
+        {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+        {% for f in formset %}
+            <div class="border rounded p-3 mb-2">
+                {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-7">{{ f.text }}</div>
+                    <div class="col-md-2">{{ f.order }}</div>
+                    <div class="col-md-2 form-check ms-2">{{ f.is_correct }} <label class="form-check-label">To‘g‘ri</label></div>
+                    {% if f.DELETE %}<div class="col-md-1 form-check">{{ f.DELETE }} <label class="form-check-label">O‘ch</label></div>{% endif %}
+                </div>
+                {% if f.errors %}<div class="text-danger small">{{ f.errors }}</div>{% endif %}
+            </div>
+        {% endfor %}
+        <button class="btn btn-primary" type="submit">Saqlash</button>
+        <a href="{% url 'teacher:lesson_detail' lesson.pk %}" class="btn btn-ghost">Orqaga</a>
+    </form>
+</div>
+{% endblock %}

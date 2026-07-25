@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav class="small text-muted mb-3">
+        <a href="{% url 'education:topic_detail' lesson.topic.pk %}">{{ lesson.topic.title }}</a> / {{ lesson.title }}
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <h1 class="h4 fw-bold mb-0">{{ lesson.title }}</h1>
+        {% if is_free %}<span class="free-badge">Bepul dars</span>{% endif %}
+    </div>
+
+    <div class="video-frame mb-3">
+        <video controls preload="metadata" src="{{ lesson.video.url }}"></video>
+    </div>
+
+    <p class="text-muted">{{ lesson.description }}</p>
+
+    {% if lesson.pdf_material %}
+        <a href="{{ lesson.pdf_material.url }}" class="btn btn-ghost btn-sm mb-3" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Qo‘shimcha material (PDF)
+        </a>
+    {% endif %}
+
+    <div class="panel mb-3">
+        <strong>Shu video testi:</strong> 10 ta savol
+        {% if best_attempt %}
+            <span class="text-muted small ms-2">Eng yaxshi: {{ best_attempt.score }}%</span>
+        {% endif %}
+        {% if can_start_test %}
+            <div class="mt-2">
+                <a href="{% url 'exam:exam_start' lesson.pk %}" class="btn btn-primary btn-sm">Testni boshlash</a>
+                <a href="{% url 'exam:exam_history' lesson.pk %}" class="btn btn-ghost btn-sm">Tarix</a>
+            </div>
+        {% else %}
+            <p class="text-muted small mb-0 mt-2">Testni ochish uchun avval videoni «Tugatildi» deb belgilang.</p>
+        {% endif %}
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3 gap-2 flex-wrap">
+        <form method="post" action="{% url 'progress:mark_lesson_complete' lesson.pk %}">
+            {% csrf_token %}
+            {% if is_completed %}
+                <button class="btn btn-success" disabled><i class="bi bi-check-circle-fill"></i> Tugatilgan</button>
+            {% else %}
+                <button type="submit" class="btn btn-outline-primary">Tugatildi deb belgilash</button>
+            {% endif %}
+        </form>
+
+        {% if next_lesson %}
+            <a href="{% url 'education:lesson_detail' next_lesson.pk %}" class="btn btn-primary">
+                Keyingi dars <i class="bi bi-arrow-right"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'education:topic_detail' lesson.topic.pk %}" class="btn btn-ghost">Mavzuga qaytish</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

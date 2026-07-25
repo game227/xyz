@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Fanlar — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h1 class="section-title mb-2">Fanlar</h1>
+    <p class="section-lead">
+        {% if free_lesson and not has_subscription %}
+            Bepul sinov: <a href="{% url 'education:lesson_detail' free_lesson.pk %}">{{ free_lesson.title }}</a>
+        {% else %}
+            Kurslarni tanlang va o‘qishni davom ettiring.
+        {% endif %}
+    </p>
+
+    <div class="subject-rail">
+        {% for subject in subjects %}
+            <a href="{% url 'education:subject_detail' subject.pk %}" class="subject-tile">
+                <div class="subject-tile__index">0{{ forloop.counter }}</div>
+                <h2 class="h5 mt-2 mb-2">{{ subject.name }}</h2>
+                <p class="mb-0 text-muted small">{{ subject.description|truncatewords:20 }}</p>
+            </a>
+        {% empty %}
+            <p class="text-muted">Hozircha fanlar qo‘shilmagan.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

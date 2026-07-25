@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ subject.name }} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav class="small text-muted mb-3"><a href="{% url 'education:subject_list' %}">Fanlar</a> / {{ subject.name }}</nav>
+    <h1 class="h3 fw-bold mb-2">{{ subject.name }}</h1>
+    <p class="text-muted mb-4">{{ subject.description }}</p>
+    <div class="subject-rail">
+        {% for course in courses %}
+            <a href="{% url 'education:course_detail' course.pk %}" class="subject-tile">
+                <div class="subject-tile__index">Kurs</div>
+                <h2 class="h5 mt-2 mb-2">{{ course.title }}</h2>
+                <p class="mb-0 text-muted small">{{ course.description|truncatewords:18 }}</p>
+            </a>
+        {% empty %}
+            <p class="text-muted">Bu fanda hozircha kurslar yo‘q.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
