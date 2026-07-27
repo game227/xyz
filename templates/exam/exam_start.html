@@ -2,30 +2,44 @@
 {% block title %}Test — {{ lesson.title }}{% endblock %}
 {% block content %}
 <div class="container py-5">
+    <nav class="crumb mb-3">
+        <a href="{% url 'education:topic_detail' topic.pk %}">{{ topic.title }}</a>
+        <span>/</span>
+        <a href="{% url 'education:lesson_detail' lesson.pk %}">{{ lesson.title }}</a>
+        <span>/</span>
+        <span>Test</span>
+    </nav>
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4 text-center">
-                    <h1 class="h4 fw-bold mb-2">{{ lesson.title }}</h1>
-                    <p class="text-muted small">{{ topic.title }} — video testi</p>
-                    <ul class="list-unstyled text-muted mb-4">
-                        <li class="mb-2"><i class="bi bi-list-ol"></i> Savollar: <strong>{{ settings.question_count }}</strong></li>
-                        <li class="mb-2"><i class="bi bi-trophy"></i> O'tish: <strong>{{ settings.passing_score }}%</strong></li>
-                        {% if settings.time_limit_minutes %}
-                        <li class="mb-2"><i class="bi bi-clock"></i> Vaqt: <strong>{{ settings.time_limit_minutes }} daqiqa</strong></li>
-                        {% endif %}
-                        <li class="mb-2"><i class="bi bi-collection"></i> Bank: <strong>{{ valid_count }}/{{ required_count }}</strong></li>
-                    </ul>
-                    {% if not bank_ready %}
-                        <div class="alert alert-warning">Test hali tayyor emas — o‘qituvchi {{ required_count }} ta savol qo‘shishi kerak.</div>
-                    {% else %}
-                        <p class="small text-muted">Savollar va javoblar har safar tasodifiy tartibda.</p>
-                        <form method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary btn-lg px-5">Boshlash</button>
-                        </form>
+        <div class="col-md-7 col-lg-6">
+            <div class="panel panel-lift text-center reveal is-visible">
+                <p class="section-kicker mb-2">Imtihon</p>
+                <h1 class="h4 fw-bold mb-2">{{ lesson.title }}</h1>
+                <p class="text-muted small mb-4">{{ topic.title }} — video testi</p>
+                <ul class="exam-meta list-unstyled text-muted mb-4 text-start mx-auto" style="max-width:16rem">
+                    <li class="mb-2"><i class="bi bi-list-ol"></i> Savollar: <strong>{{ settings.question_count }}</strong></li>
+                    <li class="mb-2"><i class="bi bi-trophy"></i> O‘tish: <strong>{{ settings.passing_score }}%</strong></li>
+                    {% if settings.time_limit_minutes %}
+                    <li class="mb-2"><i class="bi bi-clock"></i> Vaqt: <strong>{{ settings.time_limit_minutes }} daqiqa</strong></li>
                     {% endif %}
-                </div>
+                    <li class="mb-2"><i class="bi bi-collection"></i> Bank: <strong>{{ valid_count }}/{{ required_count }}</strong></li>
+                </ul>
+                {% if not bank_ready %}
+                    <div class="alert alert-warning">Test hali tayyor emas — o‘qituvchi {{ required_count }} ta savol qo‘shishi kerak.</div>
+                {% else %}
+                    <p class="small text-muted">Savollar va javoblar har safar tasodifiy tartibda.</p>
+                    {% if can_resume %}
+                    <form method="post" class="d-grid gap-2">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="resume" class="btn btn-primary btn-lg">Davom ettirish</button>
+                        <button type="submit" name="action" value="restart" class="btn btn-ghost">Qaytadan boshlash</button>
+                    </form>
+                    {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="start" class="btn btn-primary btn-lg px-5">Boshlash</button>
+                    </form>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>

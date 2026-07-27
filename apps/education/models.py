@@ -107,6 +107,11 @@ class Lesson(TimeStampedModel, ActivatableModel, OrderedModel):
         upload_to='pdfs/', blank=True, null=True, verbose_name="qo'shimcha material (PDF)"
     )
     duration_minutes = models.PositiveIntegerField(default=0, verbose_name='davomiyligi (daqiqa)')
+    is_free_preview = models.BooleanField(
+        default=False,
+        verbose_name='bepul sinov darsi',
+        help_text='Belgilangan dars platformada bepul ochiladi. Tartib o‘zgarsa ham o‘zgarmaydi.',
+    )
     created_by = models.ForeignKey(
         'accounts.CustomUser',
         on_delete=models.SET_NULL,

@@ -44,6 +44,8 @@ class SubscriptionMiddleware:
 
         messages.warning(
             request,
-            "Bu kontent uchun faol obuna kerak. Bepul dars ixtiyoriy — Obuna sahifasidan administrator bilan bog‘laning.",
+            "Bu dars yoki test pullik. Katalogni ko‘rishingiz mumkin, lekin ochish uchun "
+            "faol obuna kerak. Obuna sahifasidan tarif tanlab so‘rov yuboring yoki "
+            "administrator bilan bog‘laning.",
         )
         return redirect('subscription:info')

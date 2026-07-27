@@ -1,33 +1,80 @@
 {% extends "base.html" %}
-{% block title %}Fanlar — O‘qituvchi{% endblock %}
+{% block title %}Fanlar / daraxt — O‘qituvchi{% endblock %}
 {% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h1 class="h3 fw-bold mb-0">Fanlar / Kurslar</h1>
-        <div class="d-flex gap-2">
+        <h1 class="h3 fw-bold mb-0">Fan → Kurs → Modul → Mavzu</h1>
+        <div class="d-flex gap-2 flex-wrap">
             <a href="{% url 'teacher:subject_create' %}" class="btn btn-primary btn-sm">+ Fan</a>
             <a href="{% url 'teacher:course_create' %}" class="btn btn-ghost btn-sm">+ Kurs</a>
             <a href="{% url 'teacher:module_create' %}" class="btn btn-ghost btn-sm">+ Modul</a>
             <a href="{% url 'teacher:topic_create' %}" class="btn btn-ghost btn-sm">+ Mavzu</a>
         </div>
     </div>
-    {% for subject in subjects %}
-        <div class="lesson-row">
-            <span>
-                <strong>{{ subject.name }}</strong>
-                <span class="text-muted small ms-2">{{ subject.course_count }} kurs</span>
-                {% if not subject.is_active %}<span class="lock-badge ms-2">Nofaol</span>{% endif %}
-            </span>
-            <span class="d-flex gap-2">
-                <a href="{% url 'teacher:subject_edit' subject.pk %}" class="btn btn-sm btn-ghost">Tahrir</a>
-                <form method="post" action="{% url 'teacher:subject_delete' subject.pk %}" onsubmit="return confirm('O‘chirilsinmi?');">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-danger">O‘chirish</button>
-                </form>
-            </span>
+
+    {% for node in tree %}
+        <div class="panel mb-3 curriculum-tree">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                <strong class="h5 mb-0">{{ node.subject.name }}</strong>
+                <span class="d-flex gap-2">
+                    <a href="{% url 'teacher:subject_edit' node.subject.pk %}" class="btn btn-sm btn-ghost">Tahrir</a>
+                    <form method="post" action="{% url 'teacher:subject_delete' node.subject.pk %}" onsubmit="return confirm('Fan o‘chirilsinmi?');">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-danger">O‘chirish</button>
+                    </form>
+                </span>
+            </div>
+            {% for c in node.courses %}
+                <div class="tree-course">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <span><i class="bi bi-folder2"></i> {{ c.course.title }}</span>
+                        <span class="d-flex gap-2">
+                            <a href="{% url 'teacher:course_edit' c.course.pk %}" class="btn btn-sm btn-ghost">Tahrir</a>
+                            <form method="post" action="{% url 'teacher:course_delete' c.course.pk %}" onsubmit="return confirm('Kurs o‘chirilsinmi?');">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-danger">O‘chirish</button>
+                            </form>
+                        </span>
+                    </div>
+                    {% for m in c.modules %}
+                        <div class="tree-module">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <span><i class="bi bi-layers"></i> {{ m.module.title }}</span>
+                                <span class="d-flex gap-2">
+                                    <a href="{% url 'teacher:module_edit' m.module.pk %}" class="btn btn-sm btn-ghost">Tahrir</a>
+                                    <form method="post" action="{% url 'teacher:module_delete' m.module.pk %}" onsubmit="return confirm('Modul o‘chirilsinmi?');">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-outline-danger">O‘chirish</button>
+                                    </form>
+                                </span>
+                            </div>
+                            {% for topic in m.topics %}
+                                <div class="tree-topic d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <a href="{% url 'teacher:topic_detail' topic.pk %}">{{ topic.title }}</a>
+                                    <span class="d-flex gap-2">
+                                        <a href="{% url 'teacher:topic_edit' topic.pk %}" class="btn btn-sm btn-ghost">Tahrir</a>
+                                        <form method="post" action="{% url 'teacher:topic_delete' topic.pk %}" onsubmit="return confirm('Mavzu o‘chirilsinmi?');">
+                                            {% csrf_token %}
+                                            <button class="btn btn-sm btn-outline-danger">O‘chirish</button>
+                                        </form>
+                                    </span>
+                                </div>
+                            {% empty %}
+                                <p class="small text-muted mb-0 ms-3">Mavzu yo‘q.</p>
+                            {% endfor %}
+                        </div>
+                    {% empty %}
+                        <p class="small text-muted mb-0 ms-3">Modul yo‘q.</p>
+                    {% endfor %}
+                </div>
+            {% empty %}
+                <p class="text-muted mb-0">Kurslar yo‘q.</p>
+            {% endfor %}
         </div>
     {% empty %}
-        <p class="text-muted">Fanlar yo‘q.</p>
+        <div class="panel text-center text-muted py-5">
+            Hali fanlar yo‘q. «+ Fan» bilan boshlang.
+        </div>
     {% endfor %}
 </div>
 {% endblock %}

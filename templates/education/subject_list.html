@@ -6,6 +6,7 @@
     <p class="section-lead">
         {% if free_lesson and not has_subscription %}
             Bepul sinov: <a href="{% url 'education:lesson_detail' free_lesson.pk %}">{{ free_lesson.title }}</a>
+            — birinchi video va uning 10 talik testi.
         {% else %}
             Kurslarni tanlang va o‘qishni davom ettiring.
         {% endif %}
@@ -14,12 +15,18 @@
     <div class="subject-rail">
         {% for subject in subjects %}
             <a href="{% url 'education:subject_detail' subject.pk %}" class="subject-tile">
-                <div class="subject-tile__index">0{{ forloop.counter }}</div>
+                {% if subject.image %}
+                    <img class="subject-tile__img" src="{{ subject.image.url }}" alt="{{ subject.name }}">
+                {% else %}
+                    <div class="subject-tile__index">0{{ forloop.counter }}</div>
+                {% endif %}
                 <h2 class="h5 mt-2 mb-2">{{ subject.name }}</h2>
-                <p class="mb-0 text-muted small">{{ subject.description|truncatewords:20 }}</p>
+                <p class="mb-0 text-muted small">{{ subject.description|truncatewords:20|default:"Tavsif tez orada." }}</p>
             </a>
         {% empty %}
-            <p class="text-muted">Hozircha fanlar qo‘shilmagan.</p>
+            <div class="panel text-center text-muted py-5 w-100">
+                Hozircha fanlar qo‘shilmagan. Tez orada yangilanadi.
+            </div>
         {% endfor %}
     </div>
 </div>

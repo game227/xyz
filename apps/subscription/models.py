@@ -125,3 +125,41 @@ class ContactChannel(TimeStampedModel):
             self.ChannelType.OTHER: 'bi-link-45deg',
         }
         return defaults.get(self.channel_type, 'bi-link-45deg')
+
+
+class SubscriptionRequest(TimeStampedModel):
+    """Foydalanuvchi obuna so‘rovi — admin qo‘lda ko‘rib chiqadi (onlayn to‘lov yo‘q)."""
+
+    class Status(models.TextChoices):
+        NEW = 'NEW', 'Yangi'
+        CONTACTED = 'CONTACTED', 'Bog‘lanildi'
+        DONE = 'DONE', 'Bajarildi'
+        REJECTED = 'REJECTED', 'Rad etildi'
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='subscription_requests',
+        verbose_name='foydalanuvchi',
+    )
+    full_name = models.CharField(max_length=120, verbose_name="to‘liq ism")
+    phone = models.CharField(max_length=30, verbose_name='telefon')
+    telegram = models.CharField(max_length=120, blank=True, verbose_name='Telegram')
+    plan_days = models.PositiveIntegerField(verbose_name='tarif (kun)')
+    note = models.TextField(blank=True, verbose_name='izoh')
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.NEW,
+        verbose_name='holat',
+    )
+
+    class Meta:
+        verbose_name = 'Obuna so‘rovi'
+        verbose_name_plural = 'Obuna so‘rovlari'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.full_name} — {self.plan_days} kun ({self.status})'

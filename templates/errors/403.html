@@ -1,9 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Ruxsat yo'q — XYZ{% endblock %}
+{% block title %}Ruxsat yo‘q — {{ SITE_NAME }}{% endblock %}
 {% block content %}
-<div class="container py-5 text-center">
-    <h1 class="display-4 fw-bold text-danger">403</h1>
-    <p class="fs-5 text-muted mb-4">Bu sahifaga kirish uchun ruxsatingiz yo'q.</p>
-    <a href="/" class="btn btn-primary">Bosh sahifaga qaytish</a>
+<div class="container py-5">
+    <div class="panel panel-lift text-center error-panel reveal is-visible mx-auto" style="max-width:28rem">
+        <div class="brand-mark justify-content-center mb-3">
+            <span class="brand-mark__glyph">X</span> {{ SITE_NAME }}
+        </div>
+        <p class="section-kicker mb-2">Xato</p>
+        <h1 class="display-4 fw-bold text-danger mb-2">403</h1>
+        <p class="fs-5 text-muted mb-4">Bu sahifaga kirish uchun ruxsatingiz yo‘q.</p>
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <a href="{% url 'core:home' %}" class="btn btn-primary">Bosh sahifa</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-ghost">Kirish</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

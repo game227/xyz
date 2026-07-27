@@ -12,7 +12,7 @@
         {% for module in modules %}
         <a href="{% url 'education:module_detail' module.pk %}" class="lesson-row">
             <span>{{ module.title }}</span>
-            <span class="free-badge">{{ module.topics.count }} mavzu</span>
+            <span class="ok-badge">{{ module.topics.count }} mavzu</span>
         </a>
         {% empty %}
         <p class="text-muted">Bu kursda hozircha modullar yo‘q.</p>

@@ -82,6 +82,7 @@
                     <div class="col-md-6">
                         <label class="form-label">{{ form.phone_number.label }}</label>
                         {% render_field form.phone_number class="form-control" placeholder="+998 90 123 45 67" %}
+                        {% for error in form.phone_number.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                     </div>
                     {% if user.can_manage_content %}
                     <div class="col-12">
@@ -89,9 +90,25 @@
                         {% render_field form.specialty class="form-control" %}
                     </div>
                     {% endif %}
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.telegram.label }}</label>
+                        {% render_field form.telegram class="form-control" placeholder="@username" %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.education.label }}</label>
+                        {% render_field form.education class="form-control" %}
+                    </div>
                     <div class="col-12">
                         <label class="form-label">{{ form.bio.label }}</label>
                         {% render_field form.bio class="form-control" %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">{{ form.full_bio.label }}</label>
+                        {% render_field form.full_bio class="form-control" %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">{{ form.achievements.label }}</label>
+                        {% render_field form.achievements class="form-control" %}
                     </div>
                 </div>
                 <div class="mt-4 d-flex flex-wrap gap-2">
@@ -107,7 +124,7 @@
             <h3 class="h6 fw-bold mb-3">Tezkor havolalar</h3>
             <div class="profile-links">
                 {% if user.is_student or not user.can_manage_content %}
-                    <a href="{% url 'progress:dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <a href="{% url 'progress:dashboard' %}"><i class="bi bi-speedometer2"></i> Kabinet</a>
                     <a href="{% url 'education:subject_list' %}"><i class="bi bi-book"></i> Fanlar</a>
                     <a href="{% url 'core:rating' %}"><i class="bi bi-trophy"></i> Reyting</a>
                     <a href="{% url 'subscription:info' %}"><i class="bi bi-credit-card"></i> Obuna</a>

@@ -7,7 +7,16 @@
         <a href="{% url 'teacher:topic_list' %}">Mavzular</a> /
         {{ topic.title }}
     </nav>
-    <h1 class="h3 fw-bold mb-1">{{ topic.title }}</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h1 class="h3 fw-bold mb-0">{{ topic.title }}</h1>
+        <div class="d-flex gap-2">
+            <a href="{% url 'teacher:topic_edit' topic.pk %}" class="btn btn-ghost btn-sm">Tahrir</a>
+            <form method="post" action="{% url 'teacher:topic_delete' topic.pk %}" onsubmit="return confirm('Mavzu o‘chirilsinmi?');">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger">O‘chirish</button>
+            </form>
+        </div>
+    </div>
     <p class="text-muted">
         {{ topic.module.course.subject.name }} · {{ topic.module.course.title }} · {{ topic.module.title }}
     </p>
@@ -32,13 +41,13 @@
     {% for row in lesson_rows %}
         <a href="{% url 'teacher:lesson_detail' row.lesson.pk %}" class="lesson-row">
             <span>
-                {% if row.lesson.is_active %}<span class="free-badge">Faol</span>{% else %}<span class="lock-badge">Nofaol</span>{% endif %}
+                {% if row.lesson.is_active %}<span class="ok-badge">Faol</span>{% else %}<span class="lock-badge">Nofaol</span>{% endif %}
                 {{ row.lesson.title }}
                 <span class="text-muted small">({{ row.lesson.duration_minutes }} daq)</span>
             </span>
             <span class="text-muted small">
                 {% if row.ready %}
-                    <span class="free-badge">{{ row.valid_count }}/{{ questions_per_lesson }} test</span>
+                    <span class="ok-badge">{{ row.valid_count }}/{{ questions_per_lesson }} test</span>
                 {% else %}
                     <span class="lock-badge">{{ row.valid_count }}/{{ questions_per_lesson }}</span>
                 {% endif %}

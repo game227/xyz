@@ -195,6 +195,10 @@ class Command(BaseCommand):
             topic1, '1-dars: Kirish (bepul)', 1,
             'Platformani sinab ko‘rish uchun bepul birinchi video.',
         )
+        if not free_lesson.is_free_preview:
+            Lesson.objects.filter(is_free_preview=True).update(is_free_preview=False)
+            free_lesson.is_free_preview = True
+            free_lesson.save(update_fields=['is_free_preview'])
         paid_lesson = ensure_lesson(
             topic1, '2-dars: Amaliy misollar', 2,
             'Obuna talab qilinadigan keyingi video.',

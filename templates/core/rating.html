@@ -46,17 +46,17 @@
         {% if leaderboard %}
         <ol class="rating-list rating-list--full">
             {% for row in leaderboard %}
-            <li class="rating-list__item {% if forloop.first %}is-top{% endif %}{% if student_of_month and row.user.id == student_of_month.user.id %} is-sotm{% endif %}">
+            <li class="rating-list__item {% if forloop.first %}is-top{% endif %}{% if student_of_month and row.user.id == student_of_month.user.id %} is-sotm{% endif %}{% if my_rank and row.user.id == request.user.id %} is-you{% endif %}">
                 <span class="rating-list__rank">{{ row.rank }}</span>
                 <span class="rating-list__avatar">
                     {% if row.user.avatar %}
-                        <img src="{{ row.user.avatar.url }}" alt="">
+                        <img src="{{ row.user.avatar.url }}" alt="{{ row.user.get_full_name|default:row.user.username }}">
                     {% else %}
                         <span>{{ row.user.first_name|default:row.user.username|make_list|first }}</span>
                     {% endif %}
                 </span>
                 <span class="rating-list__who">
-                    <strong>{{ row.user.get_full_name|default:row.user.username }}</strong>
+                    <strong>{{ row.user.get_full_name|default:row.user.username }}{% if my_rank and row.user.id == request.user.id %} <span class="you-pill">Siz</span>{% endif %}</strong>
                     <small>{{ row.attempts }} urinish · {{ row.passed }} o‘tgan · eng yaxshi {{ row.best_score }}%</small>
                 </span>
                 <span class="rating-list__score">{{ row.avg_score }}%</span>

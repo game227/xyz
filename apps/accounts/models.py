@@ -15,10 +15,10 @@ from apps.core.models import TimeStampedModel
 class CustomUser(AbstractUser, TimeStampedModel):
 
     class Role(models.TextChoices):
-        STUDENT = 'STUDENT', 'Student'
+        STUDENT = 'STUDENT', 'O‘quvchi'
         ADMIN = 'ADMIN', 'Administrator'
         # Reserved for future phases — do not remove, keeps migrations stable:
-        TEACHER = 'TEACHER', 'Teacher'
+        TEACHER = 'TEACHER', 'O‘qituvchi'
         MODERATOR = 'MODERATOR', 'Moderator'
 
     role = models.CharField(

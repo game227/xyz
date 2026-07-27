@@ -8,16 +8,20 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.views import LogoutView as DjangoLogoutView
+from django.contrib.auth.views import PasswordResetCompleteView
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth.views import PasswordResetDoneView
+from django.contrib.auth.views import PasswordResetView
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 
-from .forms import LoginForm, ProfileForm, RegisterForm
+from .forms import LoginForm, ProfileForm, RegisterForm, UzPasswordResetForm, UzSetPasswordForm
 from .services import log_auth_event
 
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('core:home')
+        return redirect('progress:dashboard')
 
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -25,8 +29,12 @@ def register_view(request):
             user = form.save()
             auth_login(request, user)
             log_auth_event(request, user, 'register')
-            messages.success(request, "Ro'yxatdan muvaffaqiyatli o'tdingiz! Xush kelibsiz.")
-            return redirect('core:home')
+            messages.success(request, 'Ro‘yxatdan muvaffaqiyatli o‘tdingiz! Xush kelibsiz.')
+            from apps.subscription.access import get_freemium_lesson
+            free = get_freemium_lesson()
+            if free:
+                return redirect('education:lesson_detail', pk=free.pk)
+            return redirect('progress:dashboard')
     else:
         form = RegisterForm()
 
@@ -45,7 +53,7 @@ class LoginView(DjangoLoginView):
 
     def form_invalid(self, form):
         log_auth_event(self.request, None, 'login_failed')
-        messages.error(self.request, "Login yoki parol noto'g'ri.")
+        messages.error(self.request, 'Login yoki parol noto‘g‘ri.')
         return super().form_invalid(form)
 
     def get_success_url(self):
@@ -53,11 +61,11 @@ class LoginView(DjangoLoginView):
         next_url = self.get_redirect_url()
         if next_url:
             return next_url
-        if user.is_teacher or (user.can_manage_content and not user.is_admin_role and not user.is_superuser):
+        if user.is_teacher:
             return reverse('teacher:dashboard')
         if user.is_admin_role or user.is_superuser:
             return reverse('admin:index')
-        return super().get_success_url()
+        return reverse('progress:dashboard')
 
 
 class LogoutView(DjangoLogoutView):
@@ -67,6 +75,28 @@ class LogoutView(DjangoLogoutView):
         if request.user.is_authenticated:
             log_auth_event(request, request.user, 'logout')
         return super().dispatch(request, *args, **kwargs)
+
+
+class PasswordResetViewUz(PasswordResetView):
+    template_name = 'accounts/password_reset.html'
+    email_template_name = 'accounts/password_reset_email.txt'
+    subject_template_name = 'accounts/password_reset_subject.txt'
+    form_class = UzPasswordResetForm
+    success_url = reverse_lazy('accounts:password_reset_done')
+
+
+class PasswordResetDoneViewUz(PasswordResetDoneView):
+    template_name = 'accounts/password_reset_done.html'
+
+
+class PasswordResetConfirmViewUz(PasswordResetConfirmView):
+    template_name = 'accounts/password_reset_confirm.html'
+    form_class = UzSetPasswordForm
+    success_url = reverse_lazy('accounts:password_reset_complete')
+
+
+class PasswordResetCompleteViewUz(PasswordResetCompleteView):
+    template_name = 'accounts/password_reset_complete.html'
 
 
 @login_required

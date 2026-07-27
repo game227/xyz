@@ -53,12 +53,17 @@ def rating(request):
     if period not in ('month', 'all'):
         period = 'month'
     board = get_leaderboard(limit=50, period=period)
+    my_rank = next(
+        (row for row in board['entries'] if row['user'].pk == request.user.pk),
+        None,
+    )
     return render(request, 'core/rating.html', {
         'leaderboard': board['entries'],
         'period': period,
         'rating_year': board['year'],
         'rating_month': board['month'],
         'student_of_month': get_student_of_the_month() if period == 'month' else None,
+        'my_rank': my_rank,
     })
 
 

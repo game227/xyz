@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — {{ SITE_NAME }}{% endblock %}
+{% block title %}Kabinet — {{ SITE_NAME }}{% endblock %}
 {% block content %}
 <div class="container py-4 py-md-5">
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
-            <p class="section-kicker mb-1">Dashboard</p>
+            <p class="section-kicker mb-1">Kabinet</p>
             <h1 class="h3 fw-bold mb-1">Salom, {{ user.first_name|default:user.username }}!</h1>
             <p class="text-muted mb-0">Bugun ham bilim sari bir qadam qo‘ying.</p>
         </div>
@@ -17,8 +17,8 @@
         </div>
     {% else %}
         <div class="alert alert-warning small d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <span>Faol obuna yo‘q. Bepul dars ixtiyoriy — to‘liq kontent uchun administrator bilan bog‘laning.</span>
-            <a href="{% url 'subscription:info' %}" class="btn btn-sm btn-primary">Obuna / kontakt</a>
+            <span>Faol obuna yo‘q. Bepul dars ixtiyoriy — to‘liq kontent uchun tarif so‘rang.</span>
+            <a href="{% url 'subscription:info' %}" class="btn btn-sm btn-primary">Obuna so‘rash</a>
         </div>
     {% endif %}
 
@@ -53,25 +53,66 @@
         </div>
     </div>
 
+    {% if subject_progress %}
+    <h2 class="h5 fw-bold mb-3">Fan / kurs progressi</h2>
+    <div class="row g-3 mb-4">
+        {% for row in subject_progress %}
+        <div class="col-md-6">
+            <div class="panel reveal is-visible">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>{{ row.subject.name }}</strong>
+                    <span class="text-muted small">{{ row.percent }}%</span>
+                </div>
+                <div class="progress-ring mb-3"><span style="width: {{ row.percent }}%"></span></div>
+                {% for c in row.courses %}
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <a href="{% url 'education:course_detail' c.course.pk %}">{{ c.course.title }}</a>
+                    <span>{{ c.percent }}%</span>
+                </div>
+                {% empty %}
+                <p class="small text-muted mb-0">Bu fanda kurs yo‘q.</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12"><p class="text-muted">Hali fanlar yo‘q.</p></div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if progress_chart %}
+    <h2 class="h5 fw-bold mb-3">Oylik o‘rtacha ball</h2>
+    <div class="panel mb-4 reveal is-visible">
+        <div class="mini-chart">
+            {% for point in progress_chart %}
+            <div class="mini-chart__col" title="{{ point.label }}: {{ point.avg_score }}%">
+                <div class="mini-chart__bar" style="height: {{ point.avg_score }}%"></div>
+                <span>{{ point.label }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <h2 class="h5 fw-bold mb-3">Oxirgi test natijalari</h2>
-    <div class="panel p-0 overflow-hidden reveal is-visible">
-        <table class="table mb-0">
+    <div class="panel p-0 overflow-hidden reveal is-visible table-responsive-panel">
+        <table class="table mb-0 exam-history-table">
             <thead>
                 <tr><th class="ps-3">Mavzu</th><th>Sana</th><th>Natija</th><th>Holat</th></tr>
             </thead>
             <tbody>
             {% for attempt in recent_attempts %}
                 <tr>
-                    <td class="ps-3"><a href="{% url 'exam:exam_result' attempt.pk %}">{{ attempt.lesson.title|default:attempt.topic.title }}</a></td>
-                    <td>{{ attempt.created_at|date:"d.m.Y" }}</td>
-                    <td>{{ attempt.score }}%</td>
-                    <td>
-                        {% if attempt.is_passed %}<span class="free-badge">O‘tgan</span>
+                    <td class="ps-3" data-label="Mavzu"><a href="{% url 'exam:exam_result' attempt.pk %}">{{ attempt.lesson.title|default:attempt.topic.title }}</a></td>
+                    <td data-label="Sana">{{ attempt.created_at|date:"d.m.Y" }}</td>
+                    <td data-label="Natija">{{ attempt.score }}%</td>
+                    <td data-label="Holat">
+                        {% if attempt.is_passed %}<span class="ok-badge">O‘tgan</span>
                         {% else %}<span class="lock-badge">O‘tmagan</span>{% endif %}
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="4" class="text-muted text-center py-4">Hali test topshirilmagan.</td></tr>
+                <tr><td colspan="4" class="text-muted text-center py-4">Hali test topshirilmagan. Bepul darsdan boshlang.</td></tr>
             {% endfor %}
             </tbody>
         </table>

@@ -1,9 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Sahifa topilmadi — XYZ{% endblock %}
+{% block title %}Sahifa topilmadi — {{ SITE_NAME }}{% endblock %}
 {% block content %}
-<div class="container py-5 text-center">
-    <h1 class="display-4 fw-bold text-primary">404</h1>
-    <p class="fs-5 text-muted mb-4">Siz izlagan sahifa topilmadi.</p>
-    <a href="/" class="btn btn-primary">Bosh sahifaga qaytish</a>
+<div class="container py-5">
+    <div class="panel panel-lift text-center error-panel reveal is-visible mx-auto" style="max-width:28rem">
+        <div class="brand-mark justify-content-center mb-3">
+            <span class="brand-mark__glyph">X</span> {{ SITE_NAME }}
+        </div>
+        <p class="section-kicker mb-2">Xato</p>
+        <h1 class="display-4 fw-bold text-primary mb-2">404</h1>
+        <p class="fs-5 text-muted mb-4">Siz izlagan sahifa topilmadi yoki ko‘chirilgan.</p>
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <a href="{% url 'core:home' %}" class="btn btn-primary">Bosh sahifa</a>
+            <a href="{% url 'education:subject_list' %}" class="btn btn-ghost">Fanlar</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

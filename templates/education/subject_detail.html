@@ -2,18 +2,26 @@
 {% block title %}{{ subject.name }} — {{ SITE_NAME }}{% endblock %}
 {% block content %}
 <div class="container py-4">
-    <nav class="small text-muted mb-3"><a href="{% url 'education:subject_list' %}">Fanlar</a> / {{ subject.name }}</nav>
+    <nav class="crumb mb-3">
+        <a href="{% url 'education:subject_list' %}">Fanlar</a>
+        <span>/</span>
+        <span>{{ subject.name }}</span>
+    </nav>
     <h1 class="h3 fw-bold mb-2">{{ subject.name }}</h1>
-    <p class="text-muted mb-4">{{ subject.description }}</p>
+    <p class="text-muted mb-4">{{ subject.description|default:"Kurslardan birini tanlang." }}</p>
     <div class="subject-rail">
         {% for course in courses %}
             <a href="{% url 'education:course_detail' course.pk %}" class="subject-tile">
-                <div class="subject-tile__index">Kurs</div>
+                {% if course.image %}
+                    <img class="subject-tile__img" src="{{ course.image.url }}" alt="{{ course.title }}">
+                {% else %}
+                    <div class="subject-tile__index">Kurs</div>
+                {% endif %}
                 <h2 class="h5 mt-2 mb-2">{{ course.title }}</h2>
-                <p class="mb-0 text-muted small">{{ course.description|truncatewords:18 }}</p>
+                <p class="mb-0 text-muted small">{{ course.description|truncatewords:18|default:"Modullarni oching." }}</p>
             </a>
         {% empty %}
-            <p class="text-muted">Bu fanda hozircha kurslar yo‘q.</p>
+            <div class="panel text-center text-muted py-4 w-100">Bu fanda hozircha kurslar yo‘q.</div>
         {% endfor %}
     </div>
 </div>

@@ -2,46 +2,53 @@
 {% block title %}Urinishlar — {{ lesson.title }}{% endblock %}
 {% block content %}
 <div class="container py-4">
+    <nav class="crumb mb-3">
+        <a href="{% url 'education:lesson_detail' lesson.pk %}">{{ lesson.title }}</a>
+        <span>/</span>
+        <span>Test tarixi</span>
+    </nav>
     <h1 class="h4 fw-bold mb-4">{{ lesson.title }} — Test tarixi</h1>
 
     {% if best_attempt %}
-    <div class="alert alert-primary">
+    <div class="panel mb-3 reveal is-visible">
         Eng yaxshi natija: <strong>{{ best_attempt.score }}%</strong>
-        {% if best_attempt.is_passed %}(o'tgan){% else %}(hali o'tilmagan){% endif %}
+        {% if best_attempt.is_passed %}<span class="ok-badge ms-2">o‘tgan</span>{% else %}<span class="lock-badge ms-2">hali o‘tilmagan</span>{% endif %}
     </div>
     {% endif %}
 
-    <table class="table table-hover bg-white shadow-sm">
-        <thead>
-            <tr>
-                <th>Sana</th>
-                <th>Natija</th>
-                <th>To'g'ri</th>
-                <th>Holat</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for attempt in attempts %}
-            <tr>
-                <td>{{ attempt.created_at|date:"d.m.Y H:i" }}</td>
-                <td>{{ attempt.score }}%</td>
-                <td>{{ attempt.correct_answers }}/{{ attempt.total_questions }}</td>
-                <td>
-                    {% if attempt.is_passed %}
-                        <span class="badge bg-success">O'tgan</span>
-                    {% else %}
-                        <span class="badge bg-danger">O'tmagan</span>
-                    {% endif %}
-                </td>
-                <td><a href="{% url 'exam:exam_result' attempt.pk %}" class="btn btn-sm btn-outline-primary">Ko'rish</a></td>
-            </tr>
-        {% empty %}
-            <tr><td colspan="5" class="text-muted text-center py-4">Hali urinishlar yo'q.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="panel p-0 overflow-hidden reveal is-visible table-responsive-panel">
+        <table class="table mb-0 exam-history-table">
+            <thead>
+                <tr>
+                    <th class="ps-3">Sana</th>
+                    <th>Natija</th>
+                    <th>To‘g‘ri</th>
+                    <th>Holat</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for attempt in attempts %}
+                <tr>
+                    <td class="ps-3" data-label="Sana">{{ attempt.created_at|date:"d.m.Y H:i" }}</td>
+                    <td data-label="Natija">{{ attempt.score }}%</td>
+                    <td data-label="To‘g‘ri">{{ attempt.correct_answers }}/{{ attempt.total_questions }}</td>
+                    <td data-label="Holat">
+                        {% if attempt.is_passed %}
+                            <span class="ok-badge">O‘tgan</span>
+                        {% else %}
+                            <span class="lock-badge">O‘tmagan</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'exam:exam_result' attempt.pk %}" class="btn btn-sm btn-ghost">Ko‘rish</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-muted text-center py-4">Hali urinishlar yo‘q. Avval testni topshiring.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <a href="{% url 'education:lesson_detail' lesson.pk %}" class="btn btn-outline-secondary">Darsga qaytish</a>
+    <a href="{% url 'education:lesson_detail' lesson.pk %}" class="btn btn-ghost mt-3">Darsga qaytish</a>
 </div>
 {% endblock %}

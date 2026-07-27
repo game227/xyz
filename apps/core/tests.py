@@ -86,6 +86,9 @@ class FreemiumFlowTests(TestCase):
 
     def test_free_exam_after_completing_free_lesson_and_saves_result(self):
         self.client.login(username='student', password='student12345')
+        LessonProgress.objects.create(
+            user=self.student, lesson=self.free_lesson, watch_percent=80
+        )
         self.client.post(reverse('progress:mark_lesson_complete', args=[self.free_lesson.pk]))
         self.assertTrue(
             LessonProgress.objects.filter(

@@ -46,8 +46,25 @@ def dashboard(request):
 
 @teacher_required
 def subject_list(request):
-    subjects = Subject.objects.annotate(course_count=Count('courses')).order_by('name')
-    return render(request, 'teacher/subject_list.html', {'subjects': subjects})
+    subjects = (
+        Subject.objects.annotate(course_count=Count('courses'))
+        .prefetch_related('courses__modules__topics')
+        .order_by('name')
+    )
+    tree = []
+    for subject in subjects:
+        courses = []
+        for course in subject.courses.all().order_by('order', 'id'):
+            modules = []
+            for module in course.modules.all().order_by('order', 'id'):
+                topics = list(module.topics.all().order_by('order', 'id'))
+                modules.append({'module': module, 'topics': topics})
+            courses.append({'course': course, 'modules': modules})
+        tree.append({'subject': subject, 'courses': courses})
+    return render(request, 'teacher/subject_list.html', {
+        'subjects': subjects,
+        'tree': tree,
+    })
 
 
 @teacher_required
@@ -90,13 +107,51 @@ def course_create(request):
 
 
 @teacher_required
+def course_edit(request, pk):
+    course = get_object_or_404(Course, pk=pk)
+    form = CourseForm(request.POST or None, request.FILES or None, instance=course)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Kurs yangilandi.')
+        return redirect('teacher:subject_list')
+    return render(request, 'teacher/simple_form.html', {'form': form, 'title': 'Kursni tahrirlash'})
+
+
+@teacher_required
+@require_POST
+def course_delete(request, pk):
+    get_object_or_404(Course, pk=pk).delete()
+    messages.success(request, 'Kurs o‘chirildi.')
+    return redirect('teacher:subject_list')
+
+
+@teacher_required
 def module_create(request):
     form = ModuleForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, 'Modul yaratildi.')
-        return redirect('teacher:topic_list')
+        return redirect('teacher:subject_list')
     return render(request, 'teacher/simple_form.html', {'form': form, 'title': 'Yangi modul'})
+
+
+@teacher_required
+def module_edit(request, pk):
+    module = get_object_or_404(Module, pk=pk)
+    form = ModuleForm(request.POST or None, instance=module)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Modul yangilandi.')
+        return redirect('teacher:subject_list')
+    return render(request, 'teacher/simple_form.html', {'form': form, 'title': 'Modulni tahrirlash'})
+
+
+@teacher_required
+@require_POST
+def module_delete(request, pk):
+    get_object_or_404(Module, pk=pk).delete()
+    messages.success(request, 'Modul o‘chirildi.')
+    return redirect('teacher:subject_list')
 
 
 @teacher_required
@@ -121,6 +176,25 @@ def topic_create(request):
         messages.success(request, 'Mavzu yaratildi.')
         return redirect('teacher:topic_detail', pk=topic.pk)
     return render(request, 'teacher/simple_form.html', {'form': form, 'title': 'Yangi mavzu'})
+
+
+@teacher_required
+def topic_edit(request, pk):
+    topic = get_object_or_404(Topic, pk=pk)
+    form = TopicForm(request.POST or None, instance=topic)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Mavzu yangilandi.')
+        return redirect('teacher:topic_detail', pk=topic.pk)
+    return render(request, 'teacher/simple_form.html', {'form': form, 'title': 'Mavzuni tahrirlash'})
+
+
+@teacher_required
+@require_POST
+def topic_delete(request, pk):
+    get_object_or_404(Topic, pk=pk).delete()
+    messages.success(request, 'Mavzu o‘chirildi.')
+    return redirect('teacher:topic_list')
 
 
 @teacher_required

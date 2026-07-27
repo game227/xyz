@@ -157,6 +157,10 @@ LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'progress:dashboard'
 LOGOUT_REDIRECT_URL = 'core:home'
 
+# Parol tiklash (dev: konsolga chiqaradi; prod da SMTP sozlang)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'XYZ <noreply@xyz.uz>')
+
 # =========================================================
 # LOGGING (see apps/core — expanded in later phases)
 # =========================================================

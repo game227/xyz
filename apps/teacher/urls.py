@@ -12,11 +12,17 @@ urlpatterns = [
     path('subjects/<int:pk>/edit/', views.subject_edit, name='subject_edit'),
     path('subjects/<int:pk>/delete/', views.subject_delete, name='subject_delete'),
     path('courses/new/', views.course_create, name='course_create'),
+    path('courses/<int:pk>/edit/', views.course_edit, name='course_edit'),
+    path('courses/<int:pk>/delete/', views.course_delete, name='course_delete'),
     path('modules/new/', views.module_create, name='module_create'),
+    path('modules/<int:pk>/edit/', views.module_edit, name='module_edit'),
+    path('modules/<int:pk>/delete/', views.module_delete, name='module_delete'),
 
     path('topics/', views.topic_list, name='topic_list'),
     path('topics/new/', views.topic_create, name='topic_create'),
     path('topics/<int:pk>/', views.topic_detail, name='topic_detail'),
+    path('topics/<int:pk>/edit/', views.topic_edit, name='topic_edit'),
+    path('topics/<int:pk>/delete/', views.topic_delete, name='topic_delete'),
     path('topics/<int:topic_pk>/exam-settings/', views.exam_settings_edit, name='exam_settings'),
 
     path('lessons/', views.lesson_list, name='lesson_list'),

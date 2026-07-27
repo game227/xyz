@@ -1,6 +1,6 @@
 """Freemium + subscription access rules.
 
-- Birinchi video dars + uning 10 talik testi bepul.
+- Belgilangan (is_free_preview) yoki id bo‘yicha barqaror bepul video + 10 talik test.
 - Qolgan kontent faol obunani talab qiladi.
 - Bepul test natijalari saqlanadi.
 """
@@ -19,10 +19,13 @@ BROWSE_URL_NAMES = {
     'exam:exam_result',
 }
 
+# Video kamida shu foizgacha ko‘rilishi kerak (yoki tugatildi tugmasi ochiladi).
+MIN_WATCH_PERCENT_TO_COMPLETE = 70
+
 
 def get_freemium_lesson():
-    """Platformadagi birinchi faol video (curriculum tartibida)."""
-    return (
+    """Barqaror bepul dars: avval pin (is_free_preview), bo‘lmasa eng kichik id."""
+    base = (
         Lesson.objects.filter(
             is_active=True,
             topic__is_active=True,
@@ -36,16 +39,11 @@ def get_freemium_lesson():
             'topic__module__course',
             'topic__module__course__subject',
         )
-        .order_by(
-            'topic__module__course__subject__name',
-            'topic__module__course__order',
-            'topic__module__order',
-            'topic__order',
-            'order',
-            'id',
-        )
-        .first()
     )
+    pinned = base.filter(is_free_preview=True).order_by('id').first()
+    if pinned:
+        return pinned
+    return base.order_by('id').first()
 
 
 def is_freemium_lesson(lesson):
@@ -99,7 +97,10 @@ def is_request_allowed_without_subscription(request):
         lesson = Lesson.objects.filter(pk=kwargs.get('pk'), is_active=True).first()
         return is_freemium_lesson(lesson)
 
-    if url_name == 'progress:mark_lesson_complete':
+    if url_name in {
+        'progress:mark_lesson_complete',
+        'progress:save_watch_progress',
+    }:
         lesson = Lesson.objects.filter(pk=kwargs.get('lesson_pk'), is_active=True).first()
         return is_freemium_lesson(lesson)
 

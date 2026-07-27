@@ -22,6 +22,11 @@ class LessonProgress(TimeStampedModel):
         Lesson, on_delete=models.CASCADE, related_name='progress_entries', verbose_name='dars'
     )
     is_completed = models.BooleanField(default=False, verbose_name='tugatilgan')
+    watch_percent = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='tomosha foizi',
+        help_text='Video tomosha qilingan foiz (0–100).',
+    )
     completed_at = models.DateTimeField(blank=True, null=True, verbose_name='tugatilgan sana')
 
     class Meta:

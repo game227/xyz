@@ -2,48 +2,45 @@
 {% block title %}Natija — {{ attempt.lesson.title }}{% endblock %}
 {% block content %}
 <div class="container py-4">
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body text-center p-4">
-            <p class="text-muted mb-1">{{ attempt.lesson.title }}</p>
-            <h1 class="display-5 fw-bold {% if attempt.is_passed %}text-success{% else %}text-danger{% endif %}">
-                {{ attempt.score }}%
-            </h1>
-            <p class="fs-5 mb-1">
-                {% if attempt.is_passed %}
-                    <span class="badge bg-success">O'tdingiz</span>
-                {% else %}
-                    <span class="badge bg-danger">O'ta olmadingiz</span>
-                {% endif %}
-            </p>
-            <p class="text-muted">
-                {{ attempt.correct_answers }} / {{ attempt.total_questions }} to'g'ri javob
-            </p>
-        </div>
+    <div class="panel panel-lift text-center p-4 mb-4 reveal is-visible">
+        <p class="section-kicker mb-2">Natija</p>
+        <p class="text-muted mb-1">{{ attempt.lesson.title }}</p>
+        <h1 class="display-5 fw-bold {% if attempt.is_passed %}text-success{% else %}text-danger{% endif %}">
+            {{ attempt.score }}%
+        </h1>
+        <p class="fs-5 mb-1">
+            {% if attempt.is_passed %}
+                <span class="ok-badge">O‘tdingiz</span>
+            {% else %}
+                <span class="lock-badge">O‘ta olmadingiz</span>
+            {% endif %}
+        </p>
+        <p class="text-muted mb-0">
+            {{ attempt.correct_answers }} / {{ attempt.total_questions }} to‘g‘ri javob
+        </p>
     </div>
 
     <h2 class="h5 fw-bold mb-3">Javoblar tahlili</h2>
     {% for aq in attempt_questions %}
-    <div class="card mb-2 border-0 {% if aq.is_correct %}bg-success bg-opacity-10{% else %}bg-danger bg-opacity-10{% endif %}">
-        <div class="card-body">
-            <p class="fw-semibold mb-2">{{ forloop.counter }}. {{ aq.question.text }}</p>
-            <p class="small mb-1">
-                Sizning javobingiz:
-                <strong>{{ aq.selected_answer.text|default:"tanlanmagan" }}</strong>
-                {% if aq.is_correct %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle-fill text-danger"></i>{% endif %}
-            </p>
-            {% if not aq.is_correct %}
-                <p class="small mb-1">To'g'ri javob: <strong>{% for a in aq.question.answers.all %}{% if a.is_correct %}{{ a.text }}{% endif %}{% endfor %}</strong></p>
-            {% endif %}
-            {% if aq.question.explanation %}
-                <p class="small text-muted mb-0"><i class="bi bi-info-circle"></i> {{ aq.question.explanation }}</p>
-            {% endif %}
-        </div>
+    <div class="panel exam-review mb-2 {% if aq.is_correct %}exam-review--ok{% else %}exam-review--bad{% endif %} reveal is-visible">
+        <p class="fw-semibold mb-2">{{ forloop.counter }}. {{ aq.question.text }}</p>
+        <p class="small mb-1">
+            Sizning javobingiz:
+            <strong>{{ aq.selected_answer.text|default:"tanlanmagan" }}</strong>
+            {% if aq.is_correct %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle-fill text-danger"></i>{% endif %}
+        </p>
+        {% if not aq.is_correct %}
+            <p class="small mb-1">To‘g‘ri javob: <strong>{% for a in aq.question.answers.all %}{% if a.is_correct %}{{ a.text }}{% endif %}{% endfor %}</strong></p>
+        {% endif %}
+        {% if aq.question.explanation %}
+            <p class="small text-muted mb-0"><i class="bi bi-info-circle"></i> {{ aq.question.explanation }}</p>
+        {% endif %}
     </div>
     {% endfor %}
 
-    <div class="d-flex gap-2 mt-4">
-        <a href="{% url 'education:lesson_detail' attempt.lesson.pk %}" class="btn btn-outline-primary">Darsga qaytish</a>
-        <a href="{% url 'exam:exam_history' attempt.lesson.pk %}" class="btn btn-outline-secondary">Barcha urinishlar</a>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+        <a href="{% url 'education:lesson_detail' attempt.lesson.pk %}" class="btn btn-ghost">Darsga qaytish</a>
+        <a href="{% url 'exam:exam_history' attempt.lesson.pk %}" class="btn btn-ghost">Barcha urinishlar</a>
         <a href="{% url 'exam:exam_start' attempt.lesson.pk %}" class="btn btn-primary">Qayta urinish</a>
     </div>
 </div>

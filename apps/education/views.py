@@ -114,7 +114,11 @@ def lesson_detail(request, pk):
     )
 
     if not can_access_lesson(request.user, lesson):
-        messages.warning(request, "Bu dars uchun faol obuna kerak.")
+        messages.warning(
+            request,
+            f"«{lesson.title}» — pullik dars. Katalog ochiq, lekin tomosha uchun "
+            "faol obuna kerak. Obuna sahifasidan so‘rov yuboring.",
+        )
         return redirect('subscription:info')
 
     all_lessons = list(lesson.topic.lessons.filter(is_active=True))
@@ -122,7 +126,11 @@ def lesson_detail(request, pk):
     if next_lesson and not can_access_lesson(request.user, next_lesson):
         next_lesson = None
 
-    is_completed = request.user.lesson_progress.filter(lesson=lesson, is_completed=True).exists()
+    progress = request.user.lesson_progress.filter(lesson=lesson).first()
+    is_completed = bool(progress and progress.is_completed)
+    watch_percent = progress.watch_percent if progress else 0
+    from apps.subscription.access import MIN_WATCH_PERCENT_TO_COMPLETE
+    can_mark_complete = watch_percent >= MIN_WATCH_PERCENT_TO_COMPLETE or is_completed
     can_start_test = can_start_lesson_exam(request.user, lesson)
     best_attempt = (
         ExamAttempt.objects.filter(user=request.user, lesson=lesson)
@@ -138,4 +146,7 @@ def lesson_detail(request, pk):
         'has_subscription': has_active_subscription(request.user),
         'can_start_test': can_start_test,
         'best_attempt': best_attempt,
+        'watch_percent': watch_percent,
+        'min_watch_percent': MIN_WATCH_PERCENT_TO_COMPLETE,
+        'can_mark_complete': can_mark_complete,
     })

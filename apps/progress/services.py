@@ -4,6 +4,7 @@ Two things are stored (LessonProgress, TopicProgress); everything above
 Topic (Module/Course/Subject/overall) is computed here on read, from
 those two tables — see models.py docstring for why.
 """
+from django.db.models import Avg, Count
 from django.utils import timezone
 
 from apps.core.utils import get_logger
@@ -18,13 +19,26 @@ logger = get_logger('progress')
 # Lesson-level
 # ---------------------------------------------------------------------------
 
-def mark_lesson_complete(user, lesson):
+def mark_lesson_complete(user, lesson, *, require_watch=True):
+    from apps.subscription.access import MIN_WATCH_PERCENT_TO_COMPLETE
+
     progress, _ = LessonProgress.objects.get_or_create(user=user, lesson=lesson)
+    if require_watch and progress.watch_percent < MIN_WATCH_PERCENT_TO_COMPLETE:
+        return progress, False
     if not progress.is_completed:
         progress.is_completed = True
         progress.completed_at = timezone.now()
         progress.save(update_fields=['is_completed', 'completed_at', 'updated_at'])
         logger.info('LESSON_COMPLETED: user=%s lesson=%s', user.username, lesson.title)
+    return progress, True
+
+
+def save_watch_progress(user, lesson, percent):
+    percent = max(0, min(100, int(percent)))
+    progress, _ = LessonProgress.objects.get_or_create(user=user, lesson=lesson)
+    if percent > progress.watch_percent:
+        progress.watch_percent = percent
+        progress.save(update_fields=['watch_percent', 'updated_at'])
     return progress
 
 
@@ -154,6 +168,8 @@ def overall_progress_percent(user):
 
 def get_dashboard_context(user):
     """Aggregate everything the student dashboard needs in one call."""
+    from apps.education.models import Subject
+
     last_lesson_progress = (
         LessonProgress.objects
         .filter(user=user)
@@ -164,9 +180,50 @@ def get_dashboard_context(user):
     recent_attempts = user.exam_attempts.select_related('topic', 'lesson').order_by('-created_at')[:5]
     completed_topics_count = TopicProgress.objects.filter(user=user, is_completed=True).count()
 
+    subject_rows = []
+    for subject in Subject.objects.filter(is_active=True).order_by('name'):
+        courses = list(subject.courses.filter(is_active=True))
+        course_rows = [
+            {
+                'course': course,
+                'percent': course_progress_percent(user, course),
+            }
+            for course in courses
+        ]
+        subject_rows.append({
+            'subject': subject,
+            'percent': subject_progress_percent(user, subject),
+            'courses': course_rows,
+        })
+
+    # Oxirgi 6 oy urinishlari — oddiy chart
+    from django.db.models.functions import TruncMonth
+
+    from apps.exam.models import ExamAttempt
+
+    month_stats = (
+        ExamAttempt.objects.filter(user=user)
+        .annotate(month=TruncMonth('created_at'))
+        .values('month')
+        .annotate(avg_score=Avg('score'), attempts=Count('id'))
+        .order_by('month')
+    )
+    chart = []
+    for row in month_stats:
+        if not row['month']:
+            continue
+        chart.append({
+            'label': row['month'].strftime('%m.%Y'),
+            'avg_score': round(float(row['avg_score'] or 0), 1),
+            'attempts': row['attempts'],
+        })
+    chart = chart[-6:]
+
     return {
         'overall_progress': overall_progress_percent(user),
         'completed_topics_count': completed_topics_count,
         'last_lesson': last_lesson_progress.lesson if last_lesson_progress else None,
         'recent_attempts': recent_attempts,
+        'subject_progress': subject_rows,
+        'progress_chart': chart,
     }

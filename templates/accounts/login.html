@@ -13,6 +13,9 @@
         </div>
         <form method="post" novalidate>
             {% csrf_token %}
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
             <div class="mb-3">
                 <label class="form-label">{{ form.username.label }}</label>
                 {% render_field form.username class="form-control form-control-lg" required="required" %}
@@ -26,7 +29,10 @@
             {% endif %}
             <button type="submit" class="btn btn-primary btn-lg w-100">Kirish</button>
         </form>
-        <p class="text-center text-muted small mt-4 mb-0">
+        <p class="text-center small mt-3 mb-0">
+            <a href="{% url 'accounts:password_reset' %}">Parolni unutdingizmi?</a>
+        </p>
+        <p class="text-center text-muted small mt-3 mb-0">
             Hisobingiz yo‘qmi? <a href="{% url 'accounts:register' %}">Ro‘yxatdan o‘tish</a>
         </p>
     </div>

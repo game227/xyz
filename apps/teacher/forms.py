@@ -68,7 +68,7 @@ class LessonForm(forms.ModelForm):
         model = Lesson
         fields = (
             'topic', 'title', 'description', 'video', 'pdf_material',
-            'duration_minutes', 'order', 'is_active',
+            'duration_minutes', 'order', 'is_active', 'is_free_preview',
         )
         widgets = {'description': forms.Textarea(attrs={'rows': 3})}
 
@@ -90,6 +90,14 @@ class LessonForm(forms.ModelForm):
         if self.topic_fixed is not None:
             return self.topic_fixed
         return self.cleaned_data.get('topic')
+
+    def save(self, commit=True):
+        lesson = super().save(commit=False)
+        if commit:
+            lesson.save()
+            if lesson.is_free_preview:
+                Lesson.objects.filter(is_free_preview=True).exclude(pk=lesson.pk).update(is_free_preview=False)
+        return lesson
 
 
 class QuestionForm(forms.ModelForm):
