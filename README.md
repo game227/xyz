@@ -40,14 +40,7 @@ python manage.py seed_demo
 python manage.py runserver
 ```
 
-## Demo loginlar
 
-| Rol | Login | Parol |
-|---|---|---|
-| Admin | admin | admin12345 |
-| O‘qituvchi | teacher | teacher12345 |
-| Student (bepul) | student | student12345 |
-| Student (obunali) | paid | paid12345 |
 
 ## URL lar
 
