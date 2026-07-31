@@ -8,33 +8,12 @@ Architecture notes (keep in mind before editing):
 """
 
 import os
-import shutil
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
-
-# TMP one-shot: copy xyz-logo.png to Desktop (remove after)
-try:
-    _src = '/home/neo/.cursor/projects/home-neo/assets/xyz-logo.png'
-    _log = '/home/neo/Desktop/copy-xyz-logo.log'
-    _lines = []
-    if os.path.exists(_src):
-        _lines.append(f'SOURCE_OK size={os.path.getsize(_src)}')
-        shutil.copy2(_src, '/home/neo/Desktop/xyz-logo.png')
-        _lines.append(f'DESKTOP_OK size={os.path.getsize("/home/neo/Desktop/xyz-logo.png")}')
-        if os.path.isdir('/home/neo/Desktop/xyz-bot'):
-            shutil.copy2(_src, '/home/neo/Desktop/xyz-bot/xyz-logo.png')
-            _lines.append(f'BOT_OK size={os.path.getsize("/home/neo/Desktop/xyz-bot/xyz-logo.png")}')
-        else:
-            _lines.append('BOT_SKIP')
-    else:
-        _lines.append('MISSING_SOURCE')
-    open(_log, 'w').write('\n'.join(_lines) + '\n')
-except Exception as _e:
-    open('/home/neo/Desktop/copy-xyz-logo.log', 'w').write(f'ERROR {_e!r}\n')
 
 
 def env_bool(key, default=False):
@@ -125,22 +104,32 @@ CHANNEL_LAYERS = {
 }
 
 # =========================================================
-# DATABASE — faqat PostgreSQL (MongoDB/SQLite ishlatilmaydi)
+# DATABASE — PostgreSQL (default). SQLite faqat USE_SQLITE=True da (masalan PA).
 # =========================================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'xyz'),
-        'USER': os.getenv('DB_USER', 'xyz_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-        'CONN_MAX_AGE': 60,
-        'OPTIONS': {
-            'connect_timeout': 10,
-        },
+USE_SQLITE = env_bool('USE_SQLITE', False)
+
+if USE_SQLITE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'xyz'),
+            'USER': os.getenv('DB_USER', 'xyz_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+            'CONN_MAX_AGE': 60,
+            'OPTIONS': {
+                'connect_timeout': 10,
+            },
+        }
+    }
 
 # =========================================================
 # PASSWORD VALIDATION
