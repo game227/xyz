@@ -23,6 +23,22 @@
   object-fit: cover;
   background: #000;
 }
+.live-unmute {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0b1024;
+  background: #f5d76e;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+.live-unmute[hidden] { display: none !important; }
 .live-placeholder {
   position: absolute;
   inset: 0;

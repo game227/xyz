@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Jonli dars — {{ SITE_NAME }}{% endblock %}
 {% block extra_css %}
-<link href="{% static 'css/live.css' %}?v=1" rel="stylesheet">
+<link href="{% static 'css/live.css' %}?v=2" rel="stylesheet">
 {% endblock %}
 {% block content %}
 <div class="container py-4 live-page">
@@ -24,8 +24,9 @@
     <div class="live-layout">
         <div class="live-stage panel">
             <div class="live-video-wrap">
-                <video id="live-remote" autoplay playsinline></video>
-                <div id="live-placeholder" class="live-placeholder {% if session and session.status == 'LIVE' %}d-none{% endif %}">
+                <video id="live-remote" autoplay playsinline muted></video>
+                <button type="button" id="live-unmute" class="live-unmute" hidden>Ovozni yoqish</button>
+                <div id="live-placeholder" class="live-placeholder">
                     {% if session and session.status == 'LIVE' %}
                         Efirga ulanilmoqda…
                     {% elif session %}
@@ -57,7 +58,7 @@
                 {% endfor %}
             </div>
             {% if user.is_authenticated and session and session.status == 'LIVE' %}
-            <form id="live-chat-form" class="live-chat__form mt-2">
+            <form id="live-chat-form" class="live-chat__form mt-2" data-no-loader="1">
                 {% csrf_token %}
                 <input type="text" id="live-chat-input" class="form-control" maxlength="500" placeholder="Savolingizni yozing…" autocomplete="off">
                 <button type="submit" class="btn btn-primary btn-sm">Yuborish</button>
@@ -80,6 +81,6 @@ window.XYZ_LIVE = {
   canChat: {{ user.is_authenticated|yesno:"true,false" }}
 };
 </script>
-<script src="{% static 'js/live.js' %}?v=2"></script>
+<script src="{% static 'js/live.js' %}?v=3"></script>
 {% endif %}
 {% endblock %}

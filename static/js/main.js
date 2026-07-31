@@ -151,6 +151,8 @@
       const form = e.target;
       if (!(form instanceof HTMLFormElement)) return;
       if (form.dataset.noLoader === '1') return;
+      if (form.id === 'live-chat-form') return;
+      if (e.defaultPrevented) return;
       if (form.target === '_blank') return;
       const method = (form.method || 'get').toLowerCase();
       if (method === 'get' || method === 'post') show();

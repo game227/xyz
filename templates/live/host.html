@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Efir boshqaruvi — {{ SITE_NAME }}{% endblock %}
 {% block extra_css %}
-<link href="{% static 'css/live.css' %}?v=1" rel="stylesheet">
+<link href="{% static 'css/live.css' %}?v=2" rel="stylesheet">
 {% endblock %}
 {% block content %}
 <div class="container py-4 live-page">
@@ -52,7 +52,7 @@
                 </div>
                 {% endfor %}
             </div>
-            <form id="live-chat-form" class="live-chat__form mt-2">
+            <form id="live-chat-form" class="live-chat__form mt-2" data-no-loader="1">
                 {% csrf_token %}
                 <input type="text" id="live-chat-input" class="form-control" maxlength="500" placeholder="Javob yozing…" autocomplete="off">
                 <button type="submit" class="btn btn-primary btn-sm">Yuborish</button>
@@ -73,6 +73,6 @@ window.XYZ_LIVE = {
   canChat: true
 };
 </script>
-<script src="{% static 'js/live.js' %}?v=2"></script>
+<script src="{% static 'js/live.js' %}?v=3"></script>
 {% endif %}
 {% endblock %}
