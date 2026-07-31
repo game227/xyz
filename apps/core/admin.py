@@ -1,7 +1,54 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Founder, StudentOfTheMonth
+from .models import Founder, SiteSettings, StudentOfTheMonth
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'site_name', 'logo_preview', 'hero_video_active', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'logo_preview', 'favicon_preview')
+    fieldsets = (
+        ('Brending', {
+            'fields': (
+                'site_name', 'tagline',
+                'logo', 'logo_preview',
+                'favicon', 'favicon_preview',
+            ),
+            'description': 'Logo navbar va admin paneldа chiqadi. PNG (shaffof fon) tavsiya etiladi.',
+        }),
+        ('Bosh sahifa video', {
+            'fields': ('hero_video', 'hero_video_active'),
+        }),
+        ('Vaqt', {
+            'fields': ('created_at', 'updated_at'),
+        }),
+    )
+
+    def has_add_permission(self, request):
+        return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description='Logo')
+    def logo_preview(self, obj):
+        if obj and obj.logo:
+            return format_html(
+                '<img src="{}" style="max-height:48px;max-width:160px;object-fit:contain;'
+                'background:#0b1024;padding:6px;border-radius:10px;" />',
+                obj.logo.url,
+            )
+        return '—'
+
+    @admin.display(description='Favicon')
+    def favicon_preview(self, obj):
+        if obj and obj.favicon:
+            return format_html(
+                '<img src="{}" style="height:32px;width:32px;object-fit:contain;" />',
+                obj.favicon.url,
+            )
+        return '—'
 
 
 @admin.register(Founder)

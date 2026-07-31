@@ -21,6 +21,15 @@ class CustomUser(AbstractUser, TimeStampedModel):
         TEACHER = 'TEACHER', 'O‘qituvchi'
         MODERATOR = 'MODERATOR', 'Moderator'
 
+    # Istalgan login nomi (Django default ASCII/unicode cheklovi olib tashlangan)
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        verbose_name='login',
+        help_text='Istalgan nom — 150 belgigacha.',
+        error_messages={'unique': 'Bu login allaqachon band.'},
+    )
+
     role = models.CharField(
         max_length=20,
         choices=Role.choices,
@@ -78,3 +87,59 @@ class CustomUser(AbstractUser, TimeStampedModel):
     def can_manage_content(self):
         """Teachers and admins can manage lessons/tests on the website."""
         return self.role in {self.Role.TEACHER, self.Role.ADMIN} or self.is_superuser
+
+
+class TeacherRating(TimeStampedModel):
+    """O‘quvchi o‘qituvchiga 1–5 yulduz baho beradi."""
+
+    student = models.ForeignKey(
+        'accounts.CustomUser',
+        on_delete=models.CASCADE,
+        related_name='given_teacher_ratings',
+        verbose_name='o‘quvchi',
+    )
+    teacher = models.ForeignKey(
+        'accounts.CustomUser',
+        on_delete=models.CASCADE,
+        related_name='received_teacher_ratings',
+        verbose_name='o‘qituvchi',
+    )
+    lesson = models.ForeignKey(
+        'education.Lesson',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='teacher_ratings',
+        verbose_name='dars',
+    )
+    stars = models.PositiveSmallIntegerField(
+        verbose_name='yulduz',
+        help_text='1 dan 5 gacha',
+    )
+    comment = models.CharField(max_length=300, blank=True, verbose_name='izoh')
+
+    class Meta:
+        verbose_name = 'O‘qituvchi bahosi'
+        verbose_name_plural = 'O‘qituvchi baholari'
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['student', 'teacher', 'lesson'],
+                name='uniq_student_teacher_lesson_rating',
+            ),
+            models.CheckConstraint(
+                check=models.Q(stars__gte=1) & models.Q(stars__lte=5),
+                name='teacher_rating_stars_1_5',
+            ),
+        ]
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        super().clean()
+        if self.stars is not None and not (1 <= int(self.stars) <= 5):
+            raise ValidationError({'stars': 'Baholash 1 dan 5 gacha bo‘lishi kerak.'})
+        if self.teacher_id and self.student_id and self.teacher_id == self.student_id:
+            raise ValidationError('O‘zini o‘zi baholab bo‘lmaydi.')
+
+    def __str__(self):
+        return f'{self.teacher} ← {self.stars}★'

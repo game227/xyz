@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container py-4">
     <nav class="small text-muted mb-3">
-        <a href="{% url 'education:subject_list' %}">Fanlar</a> /
+        <a href="{% url 'education:subject_list' %}">Darslar</a> /
         <a href="{% url 'education:subject_detail' topic.module.course.subject.pk %}">{{ topic.module.course.subject.name }}</a> /
         <a href="{% url 'education:course_detail' topic.module.course.pk %}">{{ topic.module.course.title }}</a> /
         <a href="{% url 'education:module_detail' topic.module.pk %}">{{ topic.module.title }}</a> /

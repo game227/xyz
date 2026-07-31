@@ -15,12 +15,12 @@
 
   <section class="xyz-dash-hero" aria-label="Tezkor yo‘riqnoma">
     <div>
-      <h2 class="xyz-dash-hero__title">XYZ boshqaruv paneli</h2>
+      <h2 class="xyz-dash-hero__title">{{ SITE_NAME|default:"XYZ" }} boshqaruv paneli</h2>
       <p class="xyz-dash-hero__lead">
         Bu yerda saytning barcha ma’lumotlari boshqariladi.
         Eng ko‘p ishlatiladigan bo‘limlar pastda — <strong>bosib oching</strong>.
         O‘qituvchi uchun alohida panel:
-        <a href="/teacher/" style="color:#3be0a8;font-weight:700">/teacher/</a>
+        <a href="/teacher/" style="color:#38bdf8;font-weight:700">/teacher/</a>
       </p>
     </div>
     <div class="xyz-quick-grid">
@@ -36,7 +36,7 @@
       </a>
       <a class="xyz-quick-card" href="{% url 'admin:education_subject_changelist' %}">
         <span class="xyz-quick-card__icon">03</span>
-        <span class="xyz-quick-card__label">Fanlar</span>
+        <span class="xyz-quick-card__label">Darslar</span>
         <span class="xyz-quick-card__hint">Kurs → Modul → Mavzu</span>
       </a>
       <a class="xyz-quick-card" href="{% url 'admin:education_lesson_changelist' %}">
@@ -64,16 +64,27 @@
         <span class="xyz-quick-card__label">Oy o‘quvchisi</span>
         <span class="xyz-quick-card__hint">Reyting banneri</span>
       </a>
+      <a class="xyz-quick-card" href="{% url 'admin:core_sitesettings_changelist' %}">
+        <span class="xyz-quick-card__icon">09</span>
+        <span class="xyz-quick-card__label">Logo / sozlamalar</span>
+        <span class="xyz-quick-card__hint">Logo, favicon, hero video</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:subscription_subscriptionpricing_changelist' %}">
+        <span class="xyz-quick-card__icon">10</span>
+        <span class="xyz-quick-card__label">Obuna narxlari</span>
+        <span class="xyz-quick-card__hint">Tarif va so‘m</span>
+      </a>
     </div>
   </section>
 
   <aside class="xyz-help-panel">
     <h2>Qanday ishlaydi? (qisqa)</h2>
     <ol>
-      <li><strong>Kontent:</strong> Fan → Kurs → Modul → Mavzu → Video dars qo‘shing.</li>
-      <li><strong>Test:</strong> Har bir video uchun 10 ta savol qo‘shing (Savollar bo‘limi).</li>
-      <li><strong>Obuna:</strong> Foydalanuvchilar ro‘yxatida tanlang → yuqoridagi “30/90/180 kunlik obuna” amali.</li>
-      <li><strong>Bosh sahifa:</strong> Asoschilar va o‘qituvchi avatarlarini shu yerdan yangilang.</li>
+      <li><strong>Kontent:</strong> Dars → Kurs → Modul → Mavzu → Video qo‘shing.</li>
+      <li><strong>Test:</strong> Har bir video uchun 10 ta savol (Savollar).</li>
+      <li><strong>Obuna:</strong> Narxlarni «Obuna narxlari»dan boshqaring; foydalanuvchiga 30/90/180 kun bering.</li>
+      <li><strong>Brending:</strong> Logo va hero videoni «Sayt sozlamalari»dan yuklang.</li>
+      <li><strong>Jonli dars:</strong> O‘qituvchi /live/host/ orqali efir boshlaydi.</li>
     </ol>
   </aside>
 

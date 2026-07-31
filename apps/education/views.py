@@ -138,6 +138,14 @@ def lesson_detail(request, pk):
         .first()
     )
 
+    teacher = lesson.created_by if lesson.created_by_id else None
+    my_teacher_rating = None
+    if teacher and teacher.role == teacher.Role.TEACHER:
+        from apps.accounts.models import TeacherRating
+        my_teacher_rating = TeacherRating.objects.filter(
+            student=request.user, teacher=teacher, lesson=lesson
+        ).first()
+
     return render(request, 'education/lesson_detail.html', {
         'lesson': lesson,
         'next_lesson': next_lesson,
@@ -149,4 +157,6 @@ def lesson_detail(request, pk):
         'watch_percent': watch_percent,
         'min_watch_percent': MIN_WATCH_PERCENT_TO_COMPLETE,
         'can_mark_complete': can_mark_complete,
+        'lesson_teacher': teacher if teacher and getattr(teacher, 'is_teacher', False) else None,
+        'my_teacher_rating': my_teacher_rating,
     })

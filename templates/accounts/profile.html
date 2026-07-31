@@ -4,7 +4,7 @@
 {% block content %}
 <section class="profile-hero">
     <div class="container profile-hero__inner">
-        <div class="profile-hero__identity reveal is-visible">
+        <div class="profile-hero__identity reveal">
             <div class="profile-hero__avatar">
                 {% if user.avatar %}
                     <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}">
@@ -25,17 +25,17 @@
         </div>
         <div class="profile-hero__stats">
             {% if my_rank %}
-            <div class="profile-stat reveal is-visible">
+            <div class="profile-stat reveal">
                 <div class="profile-stat__value">#{{ my_rank.rank }}</div>
                 <div class="profile-stat__label">Oylik reyting</div>
             </div>
-            <div class="profile-stat reveal is-visible" style="--delay:1">
+            <div class="profile-stat reveal" style="--delay:1">
                 <div class="profile-stat__value">{{ my_rank.avg_score }}%</div>
                 <div class="profile-stat__label">O‘rtacha ball</div>
             </div>
             {% endif %}
             {% if overall_progress is not None %}
-            <div class="profile-stat reveal is-visible" style="--delay:2">
+            <div class="profile-stat reveal" style="--delay:2">
                 <div class="profile-stat__value">{{ overall_progress }}%</div>
                 <div class="profile-stat__label">Progress</div>
             </div>
@@ -45,7 +45,7 @@
 </section>
 
 <div class="container profile-grid pb-5">
-    <div class="profile-main reveal is-visible">
+    <div class="profile-main reveal">
         <div class="panel panel-lift">
             <h2 class="h5 fw-bold mb-1">Ma’lumotlarni tahrirlash</h2>
             <p class="text-muted small mb-4">Rasm, ism va aloqa ma’lumotlarini yangilang.</p>
@@ -120,23 +120,23 @@
     </div>
 
     <aside class="profile-side">
-        <div class="panel reveal is-visible">
+        <div class="panel reveal">
             <h3 class="h6 fw-bold mb-3">Tezkor havolalar</h3>
             <div class="profile-links">
                 {% if user.is_student or not user.can_manage_content %}
                     <a href="{% url 'progress:dashboard' %}"><i class="bi bi-speedometer2"></i> Kabinet</a>
-                    <a href="{% url 'education:subject_list' %}"><i class="bi bi-book"></i> Fanlar</a>
+                    <a href="{% url 'education:subject_list' %}"><i class="bi bi-book"></i> Darslar</a>
                     <a href="{% url 'core:rating' %}"><i class="bi bi-trophy"></i> Reyting</a>
                     <a href="{% url 'subscription:info' %}"><i class="bi bi-credit-card"></i> Obuna</a>
                 {% else %}
                     <a href="{% url 'teacher:dashboard' %}"><i class="bi bi-easel"></i> O‘qituvchi panel</a>
-                    <a href="{% url 'education:subject_list' %}"><i class="bi bi-book"></i> Fanlar</a>
+                    <a href="{% url 'education:subject_list' %}"><i class="bi bi-book"></i> Darslar</a>
                 {% endif %}
             </div>
         </div>
 
         {% if student_of_month %}
-        <div class="panel month-mini reveal is-visible" style="--delay:1">
+        <div class="panel month-mini reveal" style="--delay:1">
             <p class="section-kicker mb-2">Oy o‘quvchisi</p>
             <div class="month-mini__row">
                 <div class="month-mini__avatar">

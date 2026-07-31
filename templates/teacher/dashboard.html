@@ -10,13 +10,13 @@
         <div class="d-flex flex-wrap gap-2">
             <a href="{% url 'teacher:lesson_list' %}" class="btn btn-primary">Videolar</a>
             <a href="{% url 'teacher:topic_list' %}" class="btn btn-ghost">Mavzular</a>
-            <a href="{% url 'teacher:subject_list' %}" class="btn btn-ghost">Fanlar</a>
+            <a href="{% url 'teacher:subject_list' %}" class="btn btn-ghost">Darslar</a>
             <a href="{% url 'teacher:lesson_create' %}" class="btn btn-ghost">+ Video</a>
         </div>
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3"><div class="panel text-center"><div class="stat-number">{{ stats.subjects }}</div><div class="text-muted small mt-2">Fanlar</div></div></div>
+        <div class="col-6 col-md-3"><div class="panel text-center"><div class="stat-number">{{ stats.subjects }}</div><div class="text-muted small mt-2">Darslar</div></div></div>
         <div class="col-6 col-md-3"><div class="panel text-center"><div class="stat-number">{{ stats.lessons }}</div><div class="text-muted small mt-2">Videolar</div></div></div>
         <div class="col-6 col-md-3"><div class="panel text-center"><div class="stat-number">{{ stats.questions }}</div><div class="text-muted small mt-2">Savollar</div></div></div>
         <div class="col-6 col-md-3"><div class="panel text-center"><div class="stat-number">{{ stats.attempts }}</div><div class="text-muted small mt-2">Testlar</div></div></div>

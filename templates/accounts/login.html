@@ -3,10 +3,15 @@
 {% block title %}Kirish — {{ SITE_NAME }}{% endblock %}
 {% block content %}
 <div class="auth-shell container">
-    <div class="auth-panel reveal is-visible">
+    <div class="auth-panel">
         <div class="text-center mb-4">
             <div class="brand-mark justify-content-center mb-2">
-                <span class="brand-mark__glyph">X</span> {{ SITE_NAME }}
+                {% if SITE_LOGO %}
+                    <img class="brand-mark__logo" src="{{ SITE_LOGO.url }}" alt="{{ SITE_NAME }}">
+                {% else %}
+                    <span class="brand-mark__glyph">X</span>
+                {% endif %}
+                <span class="brand-mark__text">{{ SITE_NAME }}</span>
             </div>
             <h1 class="h4 fw-bold mb-1">Kirish</h1>
             <p class="text-muted small mb-0">Hisobingizga qayting — reyting va progress ochiladi</p>

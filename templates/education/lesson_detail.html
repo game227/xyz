@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container py-4">
     <nav class="crumb mb-3">
-        <a href="{% url 'education:subject_list' %}">Fanlar</a>
+        <a href="{% url 'education:subject_list' %}">Darslar</a>
         <span>/</span>
         <a href="{% url 'education:subject_detail' lesson.topic.module.course.subject.pk %}">{{ lesson.topic.module.course.subject.name }}</a>
         <span>/</span>
@@ -58,11 +58,34 @@
         {% endif %}
     </div>
 
+    {% if lesson_teacher %}
+    <div class="panel mb-3">
+        <h2 class="h6 fw-bold mb-2">O‘qituvchini baholang</h2>
+        <p class="text-muted small mb-2">
+            {{ lesson_teacher.get_full_name|default:lesson_teacher.username }} —
+            1 dan 5 yulduzgacha.
+            {% if my_teacher_rating %}(Sizning baho: {{ my_teacher_rating.stars }}★){% endif %}
+        </p>
+        <form method="post" action="{% url 'core:rate_teacher' lesson_teacher.pk %}" class="d-flex flex-wrap gap-2 align-items-center">
+            {% csrf_token %}
+            <input type="hidden" name="lesson_id" value="{{ lesson.pk }}">
+            <select name="stars" class="form-select form-select-sm u-w-auto" required>
+                <option value="">Yulduz</option>
+                {% for i in "12345" %}
+                <option value="{{ i }}" {% if my_teacher_rating and my_teacher_rating.stars == forloop.counter %}selected{% endif %}>{{ i }} ★</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="comment" class="form-control form-control-sm u-max-240" maxlength="300" placeholder="Izoh (ixtiyoriy)" value="{{ my_teacher_rating.comment|default:'' }}">
+            <button type="submit" class="btn btn-primary btn-sm">Saqlash</button>
+        </form>
+    </div>
+    {% endif %}
+
     <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3 gap-2 flex-wrap">
         <form method="post" action="{% url 'progress:mark_lesson_complete' lesson.pk %}">
             {% csrf_token %}
             {% if is_completed %}
-                <button class="btn btn-success" disabled><i class="bi bi-check-circle-fill"></i> Tugatilgan</button>
+                <button class="btn btn-primary" disabled><i class="bi bi-check-circle-fill"></i> Tugatilgan</button>
             {% else %}
                 <button type="submit" class="btn btn-outline-primary" id="complete-btn"
                         {% if not can_mark_complete %}disabled{% endif %}>

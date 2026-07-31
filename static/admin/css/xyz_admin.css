@@ -2,39 +2,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap');
 
 :root {
-  --xyz-ink: #071814;
-  --xyz-forest: #0f2f28;
-  --xyz-deep: #0c1f1a;
-  --xyz-moss: #159a6a;
-  --xyz-mint: #3be0a8;
-  --xyz-sky: #d9f6ec;
-  --xyz-paper: #f3faf7;
-  --xyz-card: #ffffff;
-  --xyz-muted: #4d635b;
-  --xyz-line: rgba(7, 24, 20, 0.10);
-  --xyz-shadow: 0 14px 40px rgba(7, 24, 20, 0.08);
-  --primary: var(--xyz-moss);
-  --secondary: var(--xyz-forest);
-  --body-fg: var(--xyz-ink);
-  --body-bg: var(--xyz-paper);
-  --body-quiet-color: var(--xyz-muted);
-  --link-fg: #127a55;
-  --link-hover-color: #0a5c3f;
-  --header-bg: linear-gradient(120deg, #0c1f1a 0%, #164a3c 55%, #1a5c4a 100%);
-  --header-color: #f4fff9;
-  --header-link-color: #d8ffe8;
-  --breadcrumbs-bg: #14352c;
-  --breadcrumbs-fg: #e8fff4;
-  --breadcrumbs-link-fg: #b8f5d8;
-  --darkened-bg: #e8f4ef;
-  --selected-bg: #d4f0e4;
+  --xyz-ink: #e8ecff;
+  --xyz-forest: #1e1b4b;
+  --xyz-deep: #070b18;
+  --xyz-moss: #6366f1;
+  --xyz-mint: #38bdf8;
+  --xyz-sky: #1e293b;
+  --xyz-paper: #0b1024;
+  --xyz-card: #121a33;
+  --xyz-muted: #94a3b8;
+  --xyz-line: rgba(148, 163, 184, 0.16);
+  --xyz-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+  --xyz-gold: #c9a227;
+  --primary: #6366f1;
+  --secondary: #1e1b4b;
+  --body-fg: #e8ecff;
+  --body-bg: #0b1024;
+  --body-quiet-color: #94a3b8;
+  --link-fg: #7dd3fc;
+  --link-hover-color: #bae6fd;
+  --header-bg: linear-gradient(120deg, #070b18 0%, #1e1b4b 55%, #312e81 100%);
+  --header-color: #f8fafc;
+  --header-link-color: #c7d2fe;
+  --breadcrumbs-bg: #151b36;
+  --breadcrumbs-fg: #e2e8f0;
+  --breadcrumbs-link-fg: #a5b4fc;
+  --darkened-bg: #151b36;
+  --selected-bg: #1e293b;
   --hairline-color: var(--xyz-line);
-  --border-color: rgba(7, 24, 20, 0.12);
-  --button-bg: var(--xyz-moss);
-  --button-hover-bg: #117a54;
-  --default-button-bg: var(--xyz-deep);
-  --default-button-hover-bg: #061510;
-  --module-caption-bg: var(--xyz-forest);
+  --border-color: rgba(148, 163, 184, 0.18);
+  --button-bg: #6366f1;
+  --button-hover-bg: #4f46e5;
+  --default-button-bg: #c9a227;
+  --default-button-hover-bg: #a8841c;
+  --module-caption-bg: #1e1b4b;
 }
 
 html[data-theme="dark"] {
@@ -54,8 +55,9 @@ html[data-theme="dark"] {
 body {
   font-family: 'Figtree', system-ui, sans-serif !important;
   background:
-    radial-gradient(900px 420px at 0% -10%, rgba(59, 224, 168, 0.14), transparent 55%),
-    radial-gradient(700px 360px at 100% 0%, rgba(21, 154, 106, 0.10), transparent 50%),
+    radial-gradient(900px 420px at 0% -10%, rgba(99, 102, 241, 0.28), transparent 55%),
+    radial-gradient(700px 360px at 100% 0%, rgba(56, 189, 248, 0.14), transparent 50%),
+    radial-gradient(600px 300px at 50% 100%, rgba(201, 162, 39, 0.08), transparent 50%),
     var(--body-bg) !important;
   color: var(--body-fg);
 }
@@ -81,13 +83,28 @@ body {
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: rgba(59, 224, 168, 0.18);
-  border: 1px solid rgba(59, 224, 168, 0.35);
-  color: #3be0a8;
+  background: rgba(99, 102, 241, 0.22);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  color: #c9a227;
   font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 13px;
   letter-spacing: 0.02em;
+}
+
+.xyz-admin-logo-link {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.xyz-admin-logo {
+  height: 40px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
 }
 
 #branding h1,
@@ -95,7 +112,7 @@ body {
 #site-name a,
 #branding h1 a:link,
 #branding h1 a:visited {
-  color: #f7fff9 !important;
+  color: #f8fafc !important;
   font-family: 'Bricolage Grotesque', sans-serif !important;
   font-weight: 800 !important;
   font-size: 1.35rem !important;
@@ -118,7 +135,7 @@ body {
 
 #user-tools a,
 #user-tools button {
-  color: #d8ffe8 !important;
+  color: #c7d2fe !important;
   border-radius: 8px;
   transition: background 0.15s ease, color 0.15s ease;
 }
@@ -173,8 +190,8 @@ div.breadcrumbs a {
   border-radius: 18px;
   background:
     linear-gradient(125deg, rgba(12, 31, 26, 0.96), rgba(26, 67, 55, 0.94)),
-    #0c1f1a;
-  color: #f7fff9;
+    #070b18;
+  color: #f8fafc;
   box-shadow: var(--xyz-shadow);
 }
 
@@ -194,7 +211,7 @@ div.breadcrumbs a {
 }
 
 .xyz-dash-hero__lead strong {
-  color: #3be0a8;
+  color: #38bdf8;
   font-weight: 700;
 }
 
@@ -213,7 +230,7 @@ div.breadcrumbs a {
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(59, 224, 168, 0.22);
-  color: #f7fff9 !important;
+  color: #f8fafc !important;
   text-decoration: none !important;
   transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
@@ -234,7 +251,7 @@ div.breadcrumbs a {
   margin-bottom: 4px;
   border-radius: 8px;
   background: rgba(59, 224, 168, 0.16);
-  color: #3be0a8;
+  color: #38bdf8;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -435,7 +452,7 @@ body.login {
   background:
     radial-gradient(800px 400px at 20% 0%, rgba(59, 224, 168, 0.22), transparent 55%),
     radial-gradient(700px 380px at 90% 100%, rgba(21, 154, 106, 0.18), transparent 50%),
-    #0c1f1a !important;
+    #070b18 !important;
 }
 
 body.login #container {

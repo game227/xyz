@@ -2,7 +2,16 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 
-from .models import CustomUser
+from .models import CustomUser, TeacherRating
+
+
+@admin.register(TeacherRating)
+class TeacherRatingAdmin(admin.ModelAdmin):
+    list_display = ('teacher', 'student', 'stars', 'lesson', 'created_at')
+    list_filter = ('stars', 'created_at')
+    search_fields = ('teacher__username', 'student__username', 'comment')
+    autocomplete_fields = ('teacher', 'student', 'lesson')
+    readonly_fields = ('created_at', 'updated_at')
 
 
 @admin.register(CustomUser)

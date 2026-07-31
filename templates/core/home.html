@@ -3,11 +3,23 @@
 {% block title %}{{ SITE_NAME }} — Universitetga tayyorlanish{% endblock %}
 {% block content %}
 
-<section class="hero">
-    <div class="hero__grid" aria-hidden="true"></div>
+<section class="hero{% if site_settings.hero_video and site_settings.hero_video_active %} hero--has-video{% endif %}">
+    {% if site_settings.hero_video and site_settings.hero_video_active %}
+    <video
+        class="hero__video"
+        id="hero-bg-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        disablePictureInPicture
+        controlslist="nodownload nofullscreen noremoteplayback"
+        src="{{ site_settings.hero_video.url }}"
+    ></video>
+    <div class="hero__video-shield" aria-hidden="true"></div>
+    {% endif %}
     <div class="hero__glow" aria-hidden="true"></div>
-    <div class="hero__orb hero__orb--a" aria-hidden="true"></div>
-    <div class="hero__orb hero__orb--b" aria-hidden="true"></div>
     <div class="container hero__content">
         <p class="hero__brand">{{ SITE_NAME }}</p>
         <h1 class="hero__title">Matematika bo‘yicha aniq tayyorgarlik</h1>
@@ -17,7 +29,7 @@
                 <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">Ro‘yxatdan o‘tish</a>
                 <a href="#asoschilar" class="btn btn-ghost btn-lg">Asoschilar</a>
             {% else %}
-                <a href="{% url 'education:subject_list' %}" class="btn btn-primary btn-lg">Fanlarga o‘tish</a>
+                <a href="{% url 'education:subject_list' %}" class="btn btn-primary btn-lg">Darslarga o‘tish</a>
                 <a href="{% url 'accounts:profile' %}" class="btn btn-ghost btn-lg">Profil</a>
             {% endif %}
         </div>
@@ -25,9 +37,8 @@
             <a href="#asoschilar">Asoschilar</a>
             <a href="#oqituvchilar">O‘qituvchilar</a>
             <a href="#oy-oquvchisi">Oy o‘quvchisi</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'core:rating' %}">Reyting</a>
-            {% endif %}
+            <a href="{% url 'live:watch' %}">Jonli dars</a>
+            <a href="{% url 'core:rating' %}">Reyting</a>
         </nav>
     </div>
 </section>
@@ -65,7 +76,7 @@
 </section>
 
 {# ——— 2. O‘qituvchilar ——— #}
-<section class="section people-section people-section--alt" id="oqituvchilar">
+<section class="section people-section" id="oqituvchilar">
     <div class="container">
         <p class="section-kicker reveal">Mentorlar</p>
         <h2 class="section-title reveal">O‘qituvchilar</h2>
@@ -78,7 +89,7 @@
                     {% if t.avatar %}
                         <img src="{{ t.avatar.url }}" alt="{{ t.get_full_name }}" loading="lazy">
                     {% else %}
-                        <div class="person-card__avatar person-card__avatar--moss" aria-hidden="true">
+                        <div class="person-card__avatar" aria-hidden="true">
                             {{ t.first_name|default:t.username|make_list|first }}
                         </div>
                     {% endif %}
@@ -128,41 +139,36 @@
             <div class="rating-panel reveal">
                 <div class="rating-panel__head">
                     <h3>Oylik reyting</h3>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'core:rating' %}">To‘liq ro‘yxat <i class="bi bi-arrow-right"></i></a>
-                    {% endif %}
+                    <a href="{% url 'core:rating' %}">
+                        {% if user.is_authenticated %}To‘liq ro‘yxat{% else %}Reyting{% endif %}
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
-                {% if user.is_authenticated %}
-                    {% if leaderboard %}
-                    <ol class="rating-list">
-                        {% for row in leaderboard %}
-                        <li class="rating-list__item {% if forloop.first %}is-top{% endif %}">
-                            <span class="rating-list__rank">{{ row.rank }}</span>
-                            <span class="rating-list__avatar">
-                                {% if row.user.avatar %}
-                                    <img src="{{ row.user.avatar.url }}" alt="">
-                                {% else %}
-                                    <span>{{ row.user.first_name|default:row.user.username|make_list|first }}</span>
-                                {% endif %}
-                            </span>
-                            <span class="rating-list__who">
-                                <strong>{{ row.user.get_full_name|default:row.user.username }}</strong>
-                                <small>{{ row.attempts }} ta test</small>
-                            </span>
-                            <span class="rating-list__score">{{ row.avg_score }}%</span>
-                        </li>
-                        {% endfor %}
-                    </ol>
-                    {% else %}
-                        <p class="text-muted mb-0">Bu oyda hali natija yo‘q.</p>
-                    {% endif %}
+                {% if leaderboard %}
+                <ol class="rating-list">
+                    {% for row in leaderboard %}
+                    <li class="rating-list__item {% if forloop.first %}is-top{% endif %}">
+                        <span class="rating-list__rank">{{ row.rank }}</span>
+                        <span class="rating-list__avatar">
+                            {% if row.user.avatar %}
+                                <img src="{{ row.user.avatar.url }}" alt="">
+                            {% else %}
+                                <span>{{ row.user.first_name|default:row.user.username|make_list|first }}</span>
+                            {% endif %}
+                        </span>
+                        <span class="rating-list__who">
+                            <strong>{{ row.user.get_full_name|default:row.user.username }}</strong>
+                            <small>{{ row.attempts }} ta test</small>
+                        </span>
+                        <span class="rating-list__score">{{ row.avg_score }}%</span>
+                    </li>
+                    {% endfor %}
+                </ol>
+                {% if not user.is_authenticated %}
+                    <p class="small text-muted mt-3 mb-0">Mehmonlarga top-3. To‘liq ro‘yxat uchun <a href="{% url 'accounts:login' %}?next={% url 'core:rating' %}">tizimga kiring</a>.</p>
+                {% endif %}
                 {% else %}
-                    <div class="rating-lock">
-                        <i class="bi bi-lock-fill"></i>
-                        <p class="mb-3">Reyting faqat tizimga kirgan foydalanuvchilar uchun.</p>
-                        <a href="{% url 'accounts:login' %}?next={% url 'core:rating' %}" class="btn btn-primary btn-sm">Kirish</a>
-                        <a href="{% url 'accounts:register' %}" class="btn btn-ghost btn-sm">Ro‘yxatdan o‘tish</a>
-                    </div>
+                    <p class="text-muted mb-0">Bu oyda hali natija yo‘q.</p>
                 {% endif %}
             </div>
         </div>
@@ -197,7 +203,7 @@
 <section class="section pt-0">
     <div class="container">
         <h2 class="section-title reveal">Yo‘nalishlar</h2>
-        <p class="section-lead reveal">Hozirgi ochiq fanlar.</p>
+        <p class="section-lead reveal">Matematika dasturi bo‘yicha ochiq darslar.</p>
         <div class="subject-rail">
             {% for subject in subjects %}
             <a href="{% if user.is_authenticated %}{% url 'education:subject_detail' subject.pk %}{% else %}{% url 'accounts:login' %}{% endif %}" class="subject-tile reveal" style="--delay: {{ forloop.counter0 }}">
@@ -217,7 +223,7 @@
             <div class="row g-4 text-center text-md-start align-items-center">
                 <div class="col-md-4">
                     <div class="stat-number" data-count="{{ stats.subjects_count }}">0</div>
-                    <div class="text-muted mt-2">Faol fan</div>
+                    <div class="text-muted mt-2">Faol dars</div>
                 </div>
                 <div class="col-md-4">
                     <div class="stat-number" data-count="{{ stats.teachers_count|default:0 }}">0</div>

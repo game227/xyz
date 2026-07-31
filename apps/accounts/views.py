@@ -8,14 +8,10 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.views import LogoutView as DjangoLogoutView
-from django.contrib.auth.views import PasswordResetCompleteView
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.contrib.auth.views import PasswordResetDoneView
-from django.contrib.auth.views import PasswordResetView
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 
-from .forms import LoginForm, ProfileForm, RegisterForm, UzPasswordResetForm, UzSetPasswordForm
+from .forms import LoginForm, ProfileForm, RegisterForm
 from .services import log_auth_event
 
 
@@ -77,26 +73,14 @@ class LogoutView(DjangoLogoutView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class PasswordResetViewUz(PasswordResetView):
-    template_name = 'accounts/password_reset.html'
-    email_template_name = 'accounts/password_reset_email.txt'
-    subject_template_name = 'accounts/password_reset_subject.txt'
-    form_class = UzPasswordResetForm
-    success_url = reverse_lazy('accounts:password_reset_done')
+def password_help_view(request):
+    """Parol tiklash — email o‘rniga admin kontaktlari."""
+    return render(request, 'accounts/password_reset.html')
 
 
-class PasswordResetDoneViewUz(PasswordResetDoneView):
-    template_name = 'accounts/password_reset_done.html'
-
-
-class PasswordResetConfirmViewUz(PasswordResetConfirmView):
-    template_name = 'accounts/password_reset_confirm.html'
-    form_class = UzSetPasswordForm
-    success_url = reverse_lazy('accounts:password_reset_complete')
-
-
-class PasswordResetCompleteViewUz(PasswordResetCompleteView):
-    template_name = 'accounts/password_reset_complete.html'
+def password_help_redirect(request, uidb64=None, token=None):
+    """Eski email havolalari shu yerga yo‘naltiriladi."""
+    return redirect('accounts:password_reset')
 
 
 @login_required

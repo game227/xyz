@@ -5,7 +5,7 @@ SUBSCRIPTION_PLANS = (
         'days': 30,
         'title': '1 oy',
         'price_label': '149 000 so‘m',
-        'blurb': 'Barcha fanlar, video va testlar',
+        'blurb': 'Barcha darslar, video va testlar',
         'popular': False,
     },
     {

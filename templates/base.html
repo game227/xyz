@@ -5,55 +5,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+    {% if SITE_FAVICON %}
+    <link rel="icon" href="{{ SITE_FAVICON.url }}">
+    {% elif SITE_LOGO %}
+    <link rel="icon" href="{{ SITE_LOGO.url }}">
+    {% endif %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="{% static 'css/main.css' %}?v=4" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}?v=12" rel="stylesheet">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+<div id="xyz-loader" class="xyz-loader" aria-hidden="true" hidden>
+    <div class="xyz-loader__card">
+        <div class="xyz-loader__letters" aria-label="XYZ">
+            <span>X</span><span>Y</span><span>Z</span>
+        </div>
+        <div class="xyz-loader__bar" aria-hidden="true"><i></i></div>
+        <p class="xyz-loader__text">Yuklanmoqda…</p>
+    </div>
+</div>
 <div class="site-shell">
 <nav class="navbar navbar-expand-lg xyz-nav sticky-top">
     <div class="container">
         <a class="brand-mark" href="{% url 'core:home' %}">
-            <span class="brand-mark__glyph">X</span>
-            {{ SITE_NAME }}
+            {% if SITE_LOGO %}
+                <img class="brand-mark__logo" src="{{ SITE_LOGO.url }}" alt="{{ SITE_NAME }}">
+            {% else %}
+                <span class="brand-mark__glyph">X</span>
+            {% endif %}
+            <span class="brand-mark__text">{{ SITE_NAME }}</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-label="Menyu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"
+                aria-label="Menyu" aria-controls="navMain" aria-expanded="false">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navMain">
-            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
                 {% block nav_links %}
                 {% with ns=request.resolver_match.namespace|default:'' un=request.resolver_match.url_name|default:'' %}
+                <li class="nav-item">
+                    <a class="nav-link {% if ns == 'live' and un != 'host' %}is-active{% endif %}" href="{% url 'live:watch' %}">Jonli</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if ns == 'core' and un == 'rating' %}is-active{% endif %}" href="{% url 'core:rating' %}">Reyting</a>
+                </li>
                 {% if user.is_authenticated %}
-                    {% if user.is_teacher %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if ns == 'teacher' %}is-active{% endif %}" href="{% url 'teacher:dashboard' %}">O‘qituvchi</a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if ns == 'education' %}is-active{% endif %}" href="{% url 'education:subject_list' %}">Darslar</a>
+                    </li>
+                    {% if user.is_student or not user.can_manage_content %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if ns == 'progress' %}is-active{% endif %}" href="{% url 'progress:dashboard' %}">Kabinet</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if ns == 'subscription' %}is-active{% endif %}" href="{% url 'subscription:info' %}">Obuna</a>
+                    </li>
+                    {% endif %}
+                    {% if user.is_teacher or user.can_manage_content %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if ns == 'teacher' %}is-active{% endif %}" href="{% url 'teacher:dashboard' %}">O‘qituvchi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if un == 'host' %}is-active{% endif %}" href="{% url 'live:host' %}">Efir</a>
+                    </li>
                     {% endif %}
                     {% if user.is_staff or user.is_admin_role %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Boshqaruv</a></li>
-                    {% endif %}
-                    {% if user.is_student or not user.can_manage_content %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if ns == 'progress' and un == 'dashboard' %}is-active{% endif %}" href="{% url 'progress:dashboard' %}">Kabinet</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if ns == 'education' %}is-active{% endif %}" href="{% url 'education:subject_list' %}">Fanlar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if ns == 'core' and un == 'rating' %}is-active{% endif %}" href="{% url 'core:rating' %}">Reyting</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if ns == 'subscription' %}is-active{% endif %}" href="{% url 'subscription:info' %}">Obuna</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if ns == 'education' %}is-active{% endif %}" href="{% url 'education:subject_list' %}">Fanlar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if ns == 'core' and un == 'rating' %}is-active{% endif %}" href="{% url 'core:rating' %}">Reyting</a>
-                        </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
                     {% endif %}
                     <li class="nav-item">
                         <a class="nav-link {% if ns == 'accounts' and un == 'profile' %}is-active{% endif %}" href="{% url 'accounts:profile' %}">Profil</a>
@@ -65,10 +83,9 @@
                         </form>
                     </li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}#asoschilar">Asoschilar</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}#oqituvchilar">O‘qituvchilar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}#asoschilar">Jamoa</a></li>
                     <li class="nav-item">
-                        <a class="nav-link {% if ns == 'accounts' and un == 'login' %}is-active{% endif %}" href="{% url 'accounts:login' %}">Kirish</a>
+                        <a class="nav-link {% if un == 'login' %}is-active{% endif %}" href="{% url 'accounts:login' %}">Kirish</a>
                     </li>
                     <li class="nav-item">
                         <a class="btn btn-primary btn-sm ms-lg-2" href="{% url 'accounts:register' %}">Ro‘yxatdan o‘tish</a>
@@ -98,9 +115,14 @@
 <footer class="xyz-footer py-4 mt-auto">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 small">
-            <div>
-                <div class="fw-semibold text-dark mb-1">{{ SITE_NAME }}</div>
-                <span>&copy; {% now "Y" %} · {{ SITE_TAGLINE }}</span>
+            <div class="d-flex align-items-center gap-2">
+                {% if SITE_LOGO %}
+                    <img src="{{ SITE_LOGO.url }}" alt="" class="footer-logo">
+                {% endif %}
+                <div>
+                    <div class="fw-semibold mb-1">{{ SITE_NAME }}</div>
+                    <span>&copy; {% now "Y" %} · {{ SITE_TAGLINE }}</span>
+                </div>
             </div>
             {% if SITE_CONTACTS %}
             <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -121,7 +143,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/main.js' %}?v=5"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

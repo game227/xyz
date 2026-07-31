@@ -6,13 +6,51 @@ from django.utils import timezone
 from apps.core.utils import get_logger
 
 from .constants import SUBSCRIPTION_PLANS
-from .models import ContactChannel, Subscription, SubscriptionRequest
+from .models import ContactChannel, Subscription, SubscriptionPricing, SubscriptionRequest
 
 logger = get_logger('subscription')
 
 
+def ensure_default_pricing():
+    """Birinchi ishga tushirishda default tariflarni yaratadi."""
+    if SubscriptionPricing.objects.exists():
+        return
+    for i, plan in enumerate(SUBSCRIPTION_PLANS):
+        price_digits = ''.join(ch for ch in plan['price_label'] if ch.isdigit())
+        SubscriptionPricing.objects.create(
+            title=plan['title'],
+            price_uzs=int(price_digits) if price_digits else 0,
+            duration_days=plan['days'],
+            description=plan['blurb'],
+            is_popular=plan.get('popular', False),
+            order=i,
+            is_active=True,
+        )
+
+
 def get_subscription_plans():
-    return list(SUBSCRIPTION_PLANS)
+    ensure_default_pricing()
+    rows = list(
+        SubscriptionPricing.objects.filter(is_active=True).order_by('order', 'duration_days', 'id')
+    )
+    return [
+        {
+            'days': row.duration_days,
+            'title': row.title,
+            'price_label': row.price_label,
+            'blurb': row.description or f'{row.duration_days} kunlik to‘liq kirish',
+            'popular': row.is_popular,
+            'pk': row.pk,
+        }
+        for row in rows
+    ]
+
+
+def get_plan_day_choices():
+    plans = get_subscription_plans()
+    if plans:
+        return [(p['days'], p['title']) for p in plans]
+    return [(30, '1 oy')]
 
 
 def get_active_contacts():

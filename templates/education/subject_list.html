@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Fanlar — {{ SITE_NAME }}{% endblock %}
+{% block title %}Darslar — {{ SITE_NAME }}{% endblock %}
 {% block content %}
 <div class="container py-4">
-    <h1 class="section-title mb-2">Fanlar</h1>
+    <h1 class="section-title mb-2">Darslar</h1>
     <p class="section-lead">
         {% if free_lesson and not has_subscription %}
             Bepul sinov: <a href="{% url 'education:lesson_detail' free_lesson.pk %}">{{ free_lesson.title }}</a>
@@ -25,7 +25,7 @@
             </a>
         {% empty %}
             <div class="panel text-center text-muted py-5 w-100">
-                Hozircha fanlar qo‘shilmagan. Tez orada yangilanadi.
+                Hozircha darslar qo‘shilmagan. Tez orada yangilanadi.
             </div>
         {% endfor %}
     </div>

@@ -19,8 +19,8 @@ class Subject(TimeStampedModel, ActivatableModel):
     image = models.ImageField(upload_to='subjects/', blank=True, null=True, verbose_name='rasm')
 
     class Meta:
-        verbose_name = 'Fan'
-        verbose_name_plural = 'Fanlar'
+        verbose_name = 'Dars'
+        verbose_name_plural = 'Darslar'
         ordering = ['name']
 
     def __str__(self):

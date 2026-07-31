@@ -7,7 +7,7 @@ on the browser alone.
 import re
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.validators import RegexValidator
 
 from .models import CustomUser
@@ -19,9 +19,14 @@ phone_validator = RegexValidator(
 
 
 class RegisterForm(UserCreationForm):
-    """Public self-registration form. Role is always forced to STUDENT —
-    admins are created via Django admin / createsuperuser only, never here.
-    """
+    """Public self-registration. Role always STUDENT."""
+
+    username = forms.CharField(
+        label='Login',
+        max_length=150,
+        help_text='Istalgan nom — o‘zingiz yoqtirgan login.',
+        widget=forms.TextInput(attrs={'autocomplete': 'username', 'placeholder': 'Masalan: aziza_matematika'}),
+    )
     email = forms.EmailField(required=True, label='Elektron pochta')
     first_name = forms.CharField(required=True, max_length=150, label='Ism')
     last_name = forms.CharField(required=True, max_length=150, label='Familiya')
@@ -32,6 +37,17 @@ class RegisterForm(UserCreationForm):
         validators=[phone_validator],
         widget=forms.TextInput(attrs={'placeholder': '+998 90 123 45 67'}),
     )
+    password1 = forms.CharField(
+        label='Parol',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        help_text='Kamida 8 belgi.',
+    )
+    password2 = forms.CharField(
+        label='Parolni tasdiqlang',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+    )
 
     class Meta:
         model = CustomUser
@@ -39,6 +55,22 @@ class RegisterForm(UserCreationForm):
             'username', 'first_name', 'last_name', 'email',
             'phone_number', 'password1', 'password2',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Faqat MinimumLengthValidator (settings) — qolgan qat’iy talablar yo‘q
+        self.fields['username'].validators = []
+
+    def clean_username(self):
+        username = (self.cleaned_data.get('username') or '').strip()
+        if not username:
+            raise forms.ValidationError('Login kiriting.')
+        if len(username) > 150:
+            raise forms.ValidationError('Login 150 belgidan oshmasin.')
+        qs = CustomUser.objects.filter(username__iexact=username)
+        if qs.exists():
+            raise forms.ValidationError('Bu login allaqachon band.')
+        return username
 
     def clean_email(self):
         email = self.cleaned_data['email'].lower().strip()
@@ -70,9 +102,12 @@ class RegisterForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
         label='Login',
-        widget=forms.TextInput(attrs={'autofocus': True}),
+        widget=forms.TextInput(attrs={'autofocus': True, 'autocomplete': 'username'}),
     )
-    password = forms.CharField(label='Parol', widget=forms.PasswordInput)
+    password = forms.CharField(
+        label='Parol',
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
+    )
 
 
 class ProfileForm(forms.ModelForm):
@@ -110,11 +145,3 @@ class ProfileForm(forms.ModelForm):
         if len(digits) == 9:
             return f'+998{digits}'
         return phone
-
-
-class UzPasswordResetForm(PasswordResetForm):
-    email = forms.EmailField(label='Elektron pochta')
-
-
-class UzSetPasswordForm(SetPasswordForm):
-    pass

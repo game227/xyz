@@ -1,20 +1,26 @@
 {% extends "admin/base.html" %}
 {% load static i18n %}
 
-{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:"XYZ Admin" }}{% endblock %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:SITE_NAME }}{% endblock %}
 
 {% block extrastyle %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/xyz_admin.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/xyz_admin.css' %}?v=2">
 {% endblock %}
 
 {% block branding %}
-<div class="xyz-admin-mark" aria-hidden="true">XYZ</div>
+{% if SITE_LOGO %}
+  <a href="{% url 'admin:index' %}" class="xyz-admin-logo-link">
+    <img src="{{ SITE_LOGO.url }}" alt="{{ SITE_NAME }}" class="xyz-admin-logo">
+  </a>
+{% else %}
+  <div class="xyz-admin-mark" aria-hidden="true">{{ SITE_NAME|default:"XYZ"|slice:":3" }}</div>
+{% endif %}
 <div>
   <h1 id="site-name">
-    <a href="{% url 'admin:index' %}">{{ site_header|default:"XYZ Boshqaruv" }}</a>
+    <a href="{% url 'admin:index' %}">{{ site_header|default:SITE_NAME }} Boshqaruv</a>
   </h1>
-  <span class="xyz-admin-tagline">Oddiy boshqaruv paneli — kontent, obuna, foydalanuvchilar</span>
+  <span class="xyz-admin-tagline">Kontent · obuna · foydalanuvchilar · jonli dars</span>
 </div>
 {% endblock %}
 

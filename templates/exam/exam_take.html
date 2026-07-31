@@ -2,7 +2,7 @@
 {% block title %}Test ishlanmoqda — {{ lesson.title }}{% endblock %}
 {% block content %}
 <div class="container py-4">
-    <div class="exam-topbar panel mb-4 reveal is-visible">
+    <div class="exam-topbar panel mb-4 reveal">
         <div>
             <p class="section-kicker mb-1">Imtihon</p>
             <h1 class="h5 fw-bold mb-0">{{ lesson.title }}</h1>
@@ -16,7 +16,7 @@
     <form method="post" action="{% url 'exam:exam_submit' lesson.pk %}" id="exam-form">
         {% csrf_token %}
         {% for item in items %}
-        <div class="panel exam-q mb-3 reveal is-visible" style="--delay:{{ forloop.counter0 }}">
+        <div class="panel exam-q mb-3 reveal" style="--delay:{{ forloop.counter0 }}">
             <p class="fw-semibold mb-3">{{ forloop.counter }}. {{ item.question.text }}</p>
             {% for answer in item.answers %}
             <div class="form-check exam-answer mb-2">

@@ -29,8 +29,8 @@ def add_ten_questions(lesson):
 
 
 class SettingsTests(TestCase):
-    def test_sqlite_fallback_is_enabled_by_default(self):
-        self.assertTrue(settings.DATABASES['default']['ENGINE'].endswith('sqlite3'))
+    def test_postgresql_is_configured(self):
+        self.assertTrue(settings.DATABASES['default']['ENGINE'].endswith('postgresql'))
 
 
 class FreemiumFlowTests(TestCase):

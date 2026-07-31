@@ -1,0 +1,271 @@
+[
+{
+  "model": "core.sitesettings",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-07-29T06:25:12.232Z",
+    "updated_at": "2026-07-29T17:34:23.423Z",
+    "site_name": "XYZ",
+    "tagline": "Faqat matematika — universitet imtihoniga onlayn tayyorgarlik",
+    "logo": "branding/photo_2026-07-16_09-28-17.jpg",
+    "favicon": "branding/Gemini_Generated_Image_osskliosskliossk.png",
+    "hero_video": "hero/fire-arrow-sukuna-jujutsu-kaisen-moewalls-com.mp4",
+    "hero_video_active": true
+  }
+},
+{
+  "model": "accounts.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$Om6WwaGsiixZR7r5g0Y1pp$A/yTZkY3U1JjktWbRW4onyMZHZC1/qgbKI1M47CNxnw=",
+    "last_login": "2026-07-29T17:35:02.439Z",
+    "is_superuser": true,
+    "first_name": "XYZ",
+    "last_name": "Admin",
+    "email": "admin@xyz.uz",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-07-24T18:48:57.837Z",
+    "created_at": "2026-07-24T18:48:57.837Z",
+    "updated_at": "2026-07-29T17:25:14.608Z",
+    "username": "admin",
+    "role": "ADMIN",
+    "phone_number": "",
+    "avatar": "",
+    "specialty": "",
+    "bio": "",
+    "full_bio": "",
+    "education": "",
+    "achievements": "",
+    "telegram": "",
+    "show_on_homepage": false,
+    "homepage_order": 0,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$QGnOeMHgjOfDUifKMhifGT$8TIkbamgiHmO6ZgvhHDVDIYlvl7C/WQJwsfr4eiZhhA=",
+    "last_login": "2026-07-29T17:35:05.436Z",
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-07-29T16:12:13.952Z",
+    "created_at": "2026-07-29T16:12:14.198Z",
+    "updated_at": "2026-07-29T17:35:04.079Z",
+    "username": "teacher1",
+    "role": "TEACHER",
+    "phone_number": "",
+    "avatar": "",
+    "specialty": "",
+    "bio": "",
+    "full_bio": "",
+    "education": "",
+    "achievements": "",
+    "telegram": "",
+    "show_on_homepage": true,
+    "homepage_order": 0,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$FgDCF4qwyoJWla5qB0pI18$Et7UZgDO2b49OPIjVClu+XV8SCV7XgwGcTPw2avvSwo=",
+    "last_login": "2026-07-29T17:32:31.033Z",
+    "is_superuser": false,
+    "first_name": "Ozodbek",
+    "last_name": "Sadullayev",
+    "email": "salomat@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-07-29T17:32:30.560Z",
+    "created_at": "2026-07-29T17:32:30.803Z",
+    "updated_at": "2026-07-29T17:32:30.803Z",
+    "username": "salom",
+    "role": "STUDENT",
+    "phone_number": "+998774166698",
+    "avatar": "",
+    "specialty": "",
+    "bio": "",
+    "full_bio": "",
+    "education": "",
+    "achievements": "",
+    "telegram": "",
+    "show_on_homepage": false,
+    "homepage_order": 0,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "subscription.contactchannel",
+  "pk": 2,
+  "fields": {
+    "created_at": "2026-07-29T17:29:44.010Z",
+    "updated_at": "2026-07-29T17:29:44.010Z",
+    "label": "Telegram",
+    "channel_type": "TELEGRAM",
+    "value": "@xyz_admin",
+    "url": "",
+    "icon": "",
+    "order": 1,
+    "is_active": true,
+    "note": "Parol / yordam"
+  }
+},
+{
+  "model": "subscription.contactchannel",
+  "pk": 3,
+  "fields": {
+    "created_at": "2026-07-29T17:29:44.185Z",
+    "updated_at": "2026-07-29T17:29:44.185Z",
+    "label": "Telefon",
+    "channel_type": "PHONE",
+    "value": "+998 90 000 00 00",
+    "url": "",
+    "icon": "",
+    "order": 2,
+    "is_active": true,
+    "note": ""
+  }
+},
+{
+  "model": "subscription.subscriptionpricing",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-07-29T06:25:11.277Z",
+    "updated_at": "2026-07-29T06:25:11.277Z",
+    "title": "1 oy",
+    "price_uzs": 149000,
+    "duration_days": 30,
+    "description": "Barcha darslar, video va testlar",
+    "is_popular": false,
+    "is_active": true,
+    "order": 0
+  }
+},
+{
+  "model": "subscription.subscriptionpricing",
+  "pk": 2,
+  "fields": {
+    "created_at": "2026-07-29T06:25:11.354Z",
+    "updated_at": "2026-07-29T06:25:11.354Z",
+    "title": "3 oy",
+    "price_uzs": 349000,
+    "duration_days": 90,
+    "description": "Eng qulay — 3 oy to‘liq kirish",
+    "is_popular": true,
+    "is_active": true,
+    "order": 1
+  }
+},
+{
+  "model": "subscription.subscriptionpricing",
+  "pk": 3,
+  "fields": {
+    "created_at": "2026-07-29T06:25:11.422Z",
+    "updated_at": "2026-07-29T06:25:11.422Z",
+    "title": "6 oy",
+    "price_uzs": 599000,
+    "duration_days": 180,
+    "description": "Imtihongacha to‘liq tayyorgarlik",
+    "is_popular": false,
+    "is_active": true,
+    "order": 2
+  }
+},
+{
+  "model": "live.livesession",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-07-29T16:13:04.113Z",
+    "updated_at": "2026-07-29T16:13:35.432Z",
+    "title": "algebra",
+    "host": [
+      "teacher1"
+    ],
+    "status": "ENDED",
+    "started_at": "2026-07-29T16:13:04.342Z",
+    "ended_at": "2026-07-29T16:13:35.431Z"
+  }
+},
+{
+  "model": "live.livesession",
+  "pk": 2,
+  "fields": {
+    "created_at": "2026-07-29T16:13:43.225Z",
+    "updated_at": "2026-07-29T16:27:21.904Z",
+    "title": "Jonli matematika darsi",
+    "host": [
+      "teacher1"
+    ],
+    "status": "ENDED",
+    "started_at": "2026-07-29T16:13:44.107Z",
+    "ended_at": "2026-07-29T16:27:21.903Z"
+  }
+},
+{
+  "model": "live.livesession",
+  "pk": 3,
+  "fields": {
+    "created_at": "2026-07-29T16:49:34.882Z",
+    "updated_at": "2026-07-29T16:50:01.639Z",
+    "title": "Jonli matematika darsi",
+    "host": [
+      "teacher1"
+    ],
+    "status": "ENDED",
+    "started_at": "2026-07-29T16:49:34.964Z",
+    "ended_at": "2026-07-29T16:50:01.639Z"
+  }
+},
+{
+  "model": "live.livesession",
+  "pk": 4,
+  "fields": {
+    "created_at": "2026-07-29T17:24:40.772Z",
+    "updated_at": "2026-07-29T17:24:43.638Z",
+    "title": "Jonli matematika darsi",
+    "host": [
+      "admin"
+    ],
+    "status": "LIVE",
+    "started_at": "2026-07-29T17:24:43.638Z",
+    "ended_at": null
+  }
+},
+{
+  "model": "live.livechatmessage",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-07-29T16:13:30.167Z",
+    "updated_at": "2026-07-29T16:13:30.168Z",
+    "session": 1,
+    "user": [
+      "teacher1"
+    ],
+    "text": "salom",
+    "is_from_teacher": true
+  }
+},
+{
+  "model": "live.livechatmessage",
+  "pk": 2,
+  "fields": {
+    "created_at": "2026-07-29T16:27:08.779Z",
+    "updated_at": "2026-07-29T16:27:08.779Z",
+    "session": 2,
+    "user": [
+      "teacher1"
+    ],
+    "text": "salom",
+    "is_from_teacher": true
+  }
+}
+]

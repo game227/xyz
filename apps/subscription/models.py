@@ -127,6 +127,30 @@ class ContactChannel(TimeStampedModel):
         return defaults.get(self.channel_type, 'bi-link-45deg')
 
 
+class SubscriptionPricing(TimeStampedModel):
+    """Obuna tariflari — narx va muddat admin paneldan boshqariladi."""
+
+    title = models.CharField(max_length=80, verbose_name='sarlavha')
+    price_uzs = models.PositiveIntegerField(verbose_name='narx (so‘m)')
+    duration_days = models.PositiveIntegerField(default=30, verbose_name='davomiyligi (kun)')
+    description = models.CharField(max_length=255, blank=True, verbose_name='tavsif')
+    is_popular = models.BooleanField(default=False, verbose_name='tavsiya etiladi')
+    is_active = models.BooleanField(default=True, verbose_name='faol')
+    order = models.PositiveIntegerField(default=0, verbose_name='tartib')
+
+    class Meta:
+        verbose_name = 'Obuna narxi'
+        verbose_name_plural = 'Obuna narxlari'
+        ordering = ['order', 'duration_days', 'id']
+
+    def __str__(self):
+        return f'{self.title} — {self.price_uzs} so‘m / {self.duration_days} kun'
+
+    @property
+    def price_label(self):
+        return f'{self.price_uzs:,}'.replace(',', ' ') + ' so‘m'
+
+
 class SubscriptionRequest(TimeStampedModel):
     """Foydalanuvchi obuna so‘rovi — admin qo‘lda ko‘rib chiqadi (onlayn to‘lov yo‘q)."""
 

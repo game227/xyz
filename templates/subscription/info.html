@@ -3,16 +3,16 @@
 {% block title %}Obuna — {{ SITE_NAME }}{% endblock %}
 {% block content %}
 <div class="container py-5">
-    <div class="text-center mb-4 reveal is-visible">
+    <div class="text-center mb-4 reveal">
         <p class="section-kicker mb-1">Obuna</p>
         <h1 class="section-title mb-2">To‘liq dasturga kirish</h1>
-        <p class="section-lead mx-auto" style="max-width:36rem">
+        <p class="section-lead lead-narrow">
             Onlayn to‘lov hozircha yo‘q — tarifni tanlab so‘rov yuboring, administrator siz bilan bog‘lanadi va obunani ochadi.
         </p>
     </div>
 
     {% if subscription %}
-    <div class="panel panel-lift mb-4 reveal is-visible">
+    <div class="panel panel-lift mb-4 reveal">
         <p class="mb-2">
             Holat:
             {% if subscription.is_currently_active %}
@@ -30,13 +30,13 @@
     <div class="row g-3 mb-4">
         {% for plan in plans %}
         <div class="col-md-4">
-            <div class="panel plan-card h-100 reveal is-visible {% if plan.popular %}plan-card--popular{% endif %}" style="--delay:{{ forloop.counter }}">
+            <div class="panel plan-card h-100 reveal {% if plan.popular %}plan-card--popular{% endif %}" style="--delay:{{ forloop.counter }}">
                 {% if plan.popular %}<span class="plan-card__tag">Tavsiya</span>{% endif %}
                 <h2 class="h5 fw-bold mb-1">{{ plan.title }}</h2>
                 <p class="plan-card__price mb-2">{{ plan.price_label }}</p>
                 <p class="text-muted small mb-3">{{ plan.blurb }} · {{ plan.days }} kun</p>
                 <a href="#obuna-sorov" class="btn {% if plan.popular %}btn-primary{% else %}btn-ghost{% endif %} w-100"
-                   onclick="document.getElementById('id_plan_days').value='{{ plan.days }}'">
+                   data-plan-days="{{ plan.days }}">
                     Shu tarifni so‘rash
                 </a>
             </div>
@@ -46,7 +46,7 @@
 
     <div class="row g-4">
         <div class="col-lg-7">
-            <div class="panel panel-lift reveal is-visible" id="obuna-sorov">
+            <div class="panel panel-lift reveal" id="obuna-sorov">
                 <h2 class="h5 fw-bold mb-1">Obuna so‘rash</h2>
                 <p class="text-muted small mb-3">Formani to‘ldiring — admin panelda so‘rov ko‘rinadi.</p>
                 <form method="post" novalidate>
@@ -79,7 +79,7 @@
                 </form>
             </div>
 
-            <div class="panel mt-3 reveal is-visible">
+            <div class="panel mt-3 reveal">
                 <h2 class="h6 fw-bold mb-2">Ixtiyoriy bepul sinov</h2>
                 <p class="text-muted mb-3">
                     Birinchi video va uning 10 talik testini bepul sinab ko‘rishingiz mumkin.
@@ -88,13 +88,13 @@
                     {% if free_lesson %}
                         <a href="{% url 'education:lesson_detail' free_lesson.pk %}" class="btn btn-ghost">Bepul dars</a>
                     {% endif %}
-                    <a href="{% url 'education:subject_list' %}" class="btn btn-ghost">Fanlar</a>
+                    <a href="{% url 'education:subject_list' %}" class="btn btn-ghost">Darslar</a>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-5">
-            <div class="panel panel-dark contact-panel h-100 reveal is-visible">
+            <div class="panel panel-dark contact-panel h-100 reveal">
                 <h2 class="h5 fw-bold mb-2">Administrator bilan bog‘lanish</h2>
                 <p class="contact-panel__lead mb-3">So‘rovdan tashqari to‘g‘ridan-to‘g‘ri yozishingiz mumkin.</p>
                 {% if contacts %}
@@ -132,4 +132,14 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.querySelectorAll('[data-plan-days]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const field = document.getElementById('id_plan_days');
+    if (field) field.value = btn.getAttribute('data-plan-days');
+  });
+});
+</script>
 {% endblock %}

@@ -5,7 +5,7 @@ Universitet kirish imtihonlariga tayyorlaydigan onlayn ta’lim platformasi.
 ## Stack
 
 - Backend: Django Templates + Service Layer
-- DB: SQLite (dev, `USE_SQLITE=True`) yoki PostgreSQL
+- DB: **PostgreSQL** (yagona). SQLite/MongoDB ishlatilmaydi.
 - Frontend: HTML5, CSS3, Bootstrap 5, JavaScript
 
 ## Arxitektura
@@ -31,16 +31,28 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-
-# Dev: USE_SQLITE=True (.env.example da)
-# Prod: USE_SQLITE=False + PostgreSQL (DB_* o‘zgaruvchilari)
+# .env da PostgreSQL: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 python manage.py migrate
 python manage.py seed_demo
 python manage.py runserver
 ```
 
+### PostgreSQL
 
+```bash
+# Misol (allaqachon sozlangan bo‘lishi mumkin):
+# DB: xyz · USER: xyz_user · HOST: localhost · PORT: 5432
+```
+
+## Demo loginlar
+
+| Rol | Login | Parol |
+|---|---|---|
+| Admin | admin | admin12345 |
+| O‘qituvchi | teacher | teacher12345 |
+| Student (bepul) | student | student12345 |
+| Student (obunali) | paid | paid12345 |
 
 ## URL lar
 

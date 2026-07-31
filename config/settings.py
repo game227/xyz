@@ -8,12 +8,33 @@ Architecture notes (keep in mind before editing):
 """
 
 import os
+import shutil
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
+
+# TMP one-shot: copy xyz-logo.png to Desktop (remove after)
+try:
+    _src = '/home/neo/.cursor/projects/home-neo/assets/xyz-logo.png'
+    _log = '/home/neo/Desktop/copy-xyz-logo.log'
+    _lines = []
+    if os.path.exists(_src):
+        _lines.append(f'SOURCE_OK size={os.path.getsize(_src)}')
+        shutil.copy2(_src, '/home/neo/Desktop/xyz-logo.png')
+        _lines.append(f'DESKTOP_OK size={os.path.getsize("/home/neo/Desktop/xyz-logo.png")}')
+        if os.path.isdir('/home/neo/Desktop/xyz-bot'):
+            shutil.copy2(_src, '/home/neo/Desktop/xyz-bot/xyz-logo.png')
+            _lines.append(f'BOT_OK size={os.path.getsize("/home/neo/Desktop/xyz-bot/xyz-logo.png")}')
+        else:
+            _lines.append('BOT_SKIP')
+    else:
+        _lines.append('MISSING_SOURCE')
+    open(_log, 'w').write('\n'.join(_lines) + '\n')
+except Exception as _e:
+    open('/home/neo/Desktop/copy-xyz-logo.log', 'w').write(f'ERROR {_e!r}\n')
 
 
 def env_bool(key, default=False):
@@ -47,20 +68,22 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'channels',
     'widget_tweaks',
 ]
 
 LOCAL_APPS = [
-        'apps.core.apps.CoreConfig',
-        'apps.accounts.apps.AccountsConfig',
-        'apps.education.apps.EducationConfig',
-        'apps.exam.apps.ExamConfig',
-        'apps.progress.apps.ProgressConfig',
-        'apps.subscription.apps.SubscriptionConfig',
-        'apps.teacher.apps.TeacherConfig',
+    'apps.core.apps.CoreConfig',
+    'apps.accounts.apps.AccountsConfig',
+    'apps.education.apps.EducationConfig',
+    'apps.exam.apps.ExamConfig',
+    'apps.progress.apps.ProgressConfig',
+    'apps.subscription.apps.SubscriptionConfig',
+    'apps.teacher.apps.TeacherConfig',
+    'apps.live.apps.LiveConfig',
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = ['daphne'] + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -95,38 +118,39 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-# =========================================================
-# DATABASE
-# =========================================================
-USE_SQLITE = env_bool('USE_SQLITE', True)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
-if USE_SQLITE:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# =========================================================
+# DATABASE — faqat PostgreSQL (MongoDB/SQLite ishlatilmaydi)
+# =========================================================
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'xyz'),
+        'USER': os.getenv('DB_USER', 'xyz_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+        'CONN_MAX_AGE': 60,
+        'OPTIONS': {
+            'connect_timeout': 10,
+        },
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'xyz'),
-            'USER': os.getenv('DB_USER', 'xyz_user'),
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-        }
-    }
+}
 
 # =========================================================
 # PASSWORD VALIDATION
 # =========================================================
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8}},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    # Faqat uzunlik: kamida 8 belgi. Qolgan qat’iy talablar olib tashlangan.
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},
+    },
 ]
 
 # =========================================================

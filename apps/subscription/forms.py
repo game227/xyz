@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
 
-from .constants import PLAN_DAYS_CHOICES
+from .services import get_plan_day_choices
 
 
 phone_validator = RegexValidator(
@@ -25,7 +25,7 @@ class SubscriptionRequestForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': '@username'}),
     )
     plan_days = forms.TypedChoiceField(
-        choices=PLAN_DAYS_CHOICES,
+        choices=[],
         coerce=int,
         label='Tarif',
     )
@@ -37,6 +37,7 @@ class SubscriptionRequestForm(forms.Form):
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['plan_days'].choices = get_plan_day_choices()
         for name, field in self.fields.items():
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs['class'] = 'form-check-input'

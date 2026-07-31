@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import ContactChannel, Subscription, SubscriptionRequest
+from .models import ContactChannel, Subscription, SubscriptionPricing, SubscriptionRequest
 
 
 @admin.register(Subscription)
@@ -54,6 +54,17 @@ class ContactChannelAdmin(admin.ModelAdmin):
         if href:
             return format_html('<a href="{}" target="_blank" rel="noopener">{}</a>', href, obj.value)
         return obj.value
+
+
+@admin.register(SubscriptionPricing)
+class SubscriptionPricingAdmin(admin.ModelAdmin):
+    list_display = (
+        'title', 'price_uzs', 'duration_days', 'is_popular', 'is_active', 'order', 'updated_at',
+    )
+    list_editable = ('price_uzs', 'duration_days', 'is_popular', 'is_active', 'order')
+    list_filter = ('is_active', 'is_popular')
+    search_fields = ('title', 'description')
+    ordering = ('order', 'duration_days')
 
 
 @admin.register(SubscriptionRequest)

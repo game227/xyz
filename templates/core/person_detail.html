@@ -4,14 +4,16 @@
 {% if person_kind == 'founder' %}{{ person.full_name }}{% else %}{{ person.get_full_name|default:person.username }}{% endif %} — {{ SITE_NAME }}
 {% endblock %}
 {% block extra_css %}
-<link href="{% static 'css/person_detail.css' %}?v=3" rel="stylesheet">
+<link href="{% static 'css/person_detail.css' %}?v=5" rel="stylesheet">
 {% endblock %}
 {% block content %}
 <section class="pd">
     <div class="pd__bg" aria-hidden="true"></div>
     <div class="container pd__shell">
-        <a class="pd__back" href="{% url 'core:home' %}#{{ back_anchor }}">
-            <i class="bi bi-chevron-left"></i> Bosh sahifa
+        <a class="pd__back" id="pd-back"
+           href="{% url 'core:home' %}#{{ back_anchor }}"
+           data-fallback="{% url 'core:home' %}#{{ back_anchor }}">
+            <i class="bi bi-chevron-left"></i> Orqaga
         </a>
 
         <div class="pd__layout">
@@ -48,6 +50,14 @@
                         {{ person.specialty|default:"Matematika o‘qituvchisi" }}
                     {% endif %}
                 </p>
+                {% if person_kind == 'teacher' and teacher_avg %}
+                <p class="pd__stars" aria-label="O‘rtacha baho">
+                    {% for i in "12345" %}
+                        <span class="{% if forloop.counter <= teacher_avg %}is-on{% endif %}">★</span>
+                    {% endfor %}
+                    <small>{{ teacher_avg|floatformat:1 }} ({{ teacher_rating_count }})</small>
+                </p>
+                {% endif %}
                 <div class="pd__social">
                     {% if person.telegram %}
                         <a href="https://t.me/{{ person.telegram|cut:'@' }}" target="_blank" rel="noopener" aria-label="Telegram"><i class="bi bi-telegram"></i></a>
@@ -100,8 +110,39 @@
                     </div>
                 </article>
                 {% endif %}
+
+                {% if not person.full_bio and not person.bio and not person.education and not person.achievements %}
+                <article class="pd__frame">
+                    <div class="pd__frame-body">
+                        <p class="text-muted mb-0">Batafsil ma’lumot tez orada qo‘shiladi.</p>
+                    </div>
+                </article>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const btn = document.getElementById('pd-back');
+  if (!btn) return;
+  btn.addEventListener('click', function (e) {
+    // Same-tab orqaga: history.back (yangi sahifa/tab ochmaslik)
+    if (window.history.length > 1 && document.referrer) {
+      try {
+        const ref = new URL(document.referrer);
+        if (ref.origin === window.location.origin) {
+          e.preventDefault();
+          window.history.back();
+          return;
+        }
+      } catch (_) {}
+    }
+    // Fallback: bosh sahifa bo‘limiga (xuddi shu tabda)
+  });
+})();
+</script>
 {% endblock %}

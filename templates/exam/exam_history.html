@@ -10,13 +10,13 @@
     <h1 class="h4 fw-bold mb-4">{{ lesson.title }} — Test tarixi</h1>
 
     {% if best_attempt %}
-    <div class="panel mb-3 reveal is-visible">
+    <div class="panel mb-3 reveal">
         Eng yaxshi natija: <strong>{{ best_attempt.score }}%</strong>
         {% if best_attempt.is_passed %}<span class="ok-badge ms-2">o‘tgan</span>{% else %}<span class="lock-badge ms-2">hali o‘tilmagan</span>{% endif %}
     </div>
     {% endif %}
 
-    <div class="panel p-0 overflow-hidden reveal is-visible table-responsive-panel">
+    <div class="panel p-0 overflow-hidden reveal table-responsive-panel">
         <table class="table mb-0 exam-history-table">
             <thead>
                 <tr>

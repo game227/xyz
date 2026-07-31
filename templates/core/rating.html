@@ -21,7 +21,7 @@
     </div>
 
     {% if student_of_month and period == 'month' %}
-    <article class="sotm-banner reveal is-visible mb-4">
+    <article class="sotm-banner reveal mb-4">
         <div class="sotm-banner__photo">
             {% if student_of_month.user.avatar %}
                 <img src="{{ student_of_month.user.avatar.url }}" alt="{{ student_of_month.user.get_full_name }}">
@@ -42,9 +42,9 @@
     </article>
     {% endif %}
 
-    <div class="rating-panel reveal is-visible">
+    <div class="rating-panel reveal">
         {% if leaderboard %}
-        <ol class="rating-list rating-list--full">
+        <ol class="rating-list">
             {% for row in leaderboard %}
             <li class="rating-list__item {% if forloop.first %}is-top{% endif %}{% if student_of_month and row.user.id == student_of_month.user.id %} is-sotm{% endif %}{% if my_rank and row.user.id == request.user.id %} is-you{% endif %}">
                 <span class="rating-list__rank">{{ row.rank }}</span>
@@ -65,6 +65,17 @@
         </ol>
         {% else %}
             <p class="text-muted text-center py-5 mb-0">Hali reyting uchun natija yo‘q. Test topshiring!</p>
+        {% endif %}
+        {% if is_partial %}
+            <div class="text-center mt-3 pb-2">
+                <p class="text-muted small mb-2">Mehmonlarga faqat top-3 ko‘rsatiladi.</p>
+                <a href="{% url 'accounts:login' %}?next={% url 'core:rating' %}" class="btn btn-primary btn-sm">Kirish — to‘liq reyting</a>
+            </div>
+        {% endif %}
+        {% if user.is_authenticated %}
+            <div class="text-center mt-3">
+                <a href="{% url 'core:teacher_rating_list' %}" class="btn btn-ghost btn-sm">O‘qituvchilar reytingi →</a>
+            </div>
         {% endif %}
     </div>
 </div>

@@ -2,7 +2,7 @@
 {% block title %}Natija — {{ attempt.lesson.title }}{% endblock %}
 {% block content %}
 <div class="container py-4">
-    <div class="panel panel-lift text-center p-4 mb-4 reveal is-visible">
+    <div class="panel panel-lift text-center p-4 mb-4 reveal">
         <p class="section-kicker mb-2">Natija</p>
         <p class="text-muted mb-1">{{ attempt.lesson.title }}</p>
         <h1 class="display-5 fw-bold {% if attempt.is_passed %}text-success{% else %}text-danger{% endif %}">
@@ -22,7 +22,7 @@
 
     <h2 class="h5 fw-bold mb-3">Javoblar tahlili</h2>
     {% for aq in attempt_questions %}
-    <div class="panel exam-review mb-2 {% if aq.is_correct %}exam-review--ok{% else %}exam-review--bad{% endif %} reveal is-visible">
+    <div class="panel exam-review mb-2 {% if aq.is_correct %}exam-review--ok{% else %}exam-review--bad{% endif %} reveal">
         <p class="fw-semibold mb-2">{{ forloop.counter }}. {{ aq.question.text }}</p>
         <p class="small mb-1">
             Sizning javobingiz:

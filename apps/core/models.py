@@ -71,6 +71,61 @@ class Founder(TimeStampedModel, ActivatableModel, OrderedModel):
         return f'{self.full_name} — {self.role_title}'
 
 
+class SiteSettings(TimeStampedModel):
+    """Singleton: logo, hero video va sayt sozlamalari."""
+
+    site_name = models.CharField(
+        max_length=80, default='XYZ', verbose_name='sayt nomi',
+    )
+    tagline = models.CharField(
+        max_length=200,
+        blank=True,
+        default='Faqat matematika — universitet imtihoniga onlayn tayyorgarlik',
+        verbose_name='qisqa tavsif',
+    )
+    logo = models.ImageField(
+        upload_to='branding/',
+        blank=True,
+        null=True,
+        verbose_name='logo',
+        help_text='PNG/SVG/JPG — navbar va admin paneldа ko‘rinadi.',
+    )
+    favicon = models.ImageField(
+        upload_to='branding/',
+        blank=True,
+        null=True,
+        verbose_name='favicon',
+        help_text='Ixtiyoriy: brauzer tab ikonkasi (32×32 yoki 64×64).',
+    )
+    hero_video = models.FileField(
+        upload_to='hero/',
+        blank=True,
+        null=True,
+        verbose_name='bosh sahifa video',
+        help_text='Ovozsiz, avtomatik aylanish. Controls yo‘q.',
+    )
+    hero_video_active = models.BooleanField(
+        default=True,
+        verbose_name='hero video faol',
+    )
+
+    class Meta:
+        verbose_name = 'Sayt sozlamasi'
+        verbose_name_plural = 'Sayt sozlamalari'
+
+    def __str__(self):
+        return 'Sayt sozlamalari'
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+
 class StudentOfTheMonth(TimeStampedModel):
     """Admin belgilagan oy o‘quvchisi. Bo‘sh qolsa — reytingdan avtomatik olinadi."""
 

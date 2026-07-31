@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}O‘qituvchilar reytingi — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+        <div>
+            <p class="section-kicker mb-1">Reyting</p>
+            <h1 class="section-title mb-0">O‘qituvchilar</h1>
+            <p class="section-lead mb-0">O‘quvchilar 1–5 yulduz bilan baholagan natija.</p>
+        </div>
+        <a href="{% url 'core:rating' %}" class="btn btn-ghost btn-sm">O‘quvchilar reytingi</a>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+        {% for t in teachers %}
+        <div class="teacher-rating-card reveal">
+            <div class="rating-list__avatar rating-list__avatar--lg">
+                {% if t.avatar %}
+                    <img src="{{ t.avatar.url }}" alt="">
+                {% else %}
+                    <span>{{ t.first_name|default:t.username|make_list|first }}</span>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <h2 class="h5 mb-1">
+                    <a href="{% url 'core:teacher_detail' t.pk %}">{{ t.get_full_name|default:t.username }}</a>
+                </h2>
+                <p class="text-muted small mb-1">{{ t.specialty|default:"Matematika o‘qituvchisi" }}</p>
+                <div class="star-rating" aria-label="O‘rtacha baho">
+                    {% with avg=t.avg_stars|default_if_none:0 %}
+                    {% for i in "12345" %}
+                        <span class="{% if forloop.counter <= avg %}is-on{% endif %}">★</span>
+                    {% endfor %}
+                    <span class="small text-muted ms-2">
+                        {% if t.rating_count %}{{ avg|floatformat:1 }} · {{ t.rating_count }} ta baho{% else %}Hali baho yo‘q{% endif %}
+                    </span>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">Hali o‘qituvchi yo‘q.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
