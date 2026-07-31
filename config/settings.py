@@ -10,6 +10,7 @@ Architecture notes (keep in mind before editing):
 import os
 from pathlib import Path
 
+import dj_database_url
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +34,28 @@ ALLOWED_HOSTS = [
     for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
     if host.strip()
 ]
+
+# Render / boshqa PaaS hostlar
+_render_host = os.getenv('RENDER_EXTERNAL_HOSTNAME', '').strip()
+if _render_host and _render_host not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_render_host)
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+if _render_host:
+    _origin = f'https://{_render_host}'
+    if _origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_origin)
+
+# HTTPS ortida (Render / Railway / Runsite)
+if env_bool('BEHIND_PROXY', bool(_render_host)):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = not DEBUG
+    CSRF_COOKIE_SECURE = not DEBUG
+
 
 # =========================================================
 # APPLICATIONS
@@ -66,6 +89,7 @@ INSTALLED_APPS = ['daphne'] + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -104,11 +128,20 @@ CHANNEL_LAYERS = {
 }
 
 # =========================================================
-# DATABASE — PostgreSQL (default). SQLite faqat USE_SQLITE=True da (masalan PA).
+# DATABASE — DATABASE_URL (Render/Neon) > SQLite > PostgreSQL env
 # =========================================================
 USE_SQLITE = env_bool('USE_SQLITE', False)
+_database_url = os.getenv('DATABASE_URL', '').strip()
 
-if USE_SQLITE:
+if _database_url:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            _database_url,
+            conn_max_age=60,
+            ssl_require=env_bool('DB_SSL_REQUIRE', True),
+        )
+    }
+elif USE_SQLITE:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -156,6 +189,14 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
