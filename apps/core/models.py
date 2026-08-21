@@ -193,7 +193,7 @@ class Notification(TimeStampedModel):
         verbose_name_plural = 'Bildirishnomalar'
         ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['user', 'is_read']),
+            models.Index(fields=['user', 'is_read'], name='core_notif_user_id_read_idx'),
         ]
 
     def __str__(self):
