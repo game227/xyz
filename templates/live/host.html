@@ -2,10 +2,10 @@
 {% load static %}
 {% block title %}Efir boshqaruvi — {{ SITE_NAME }}{% endblock %}
 {% block extra_css %}
-<link href="{% static 'css/live.css' %}?v=2" rel="stylesheet">
+<link href="{% static 'css/live.css' %}?v=4" rel="stylesheet">
 {% endblock %}
 {% block content %}
-<div class="container py-4 live-page">
+<div class="container py-4 live-page mx-auto">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
             <p class="section-kicker mb-1">O‘qituvchi</p>
@@ -15,64 +15,52 @@
     </div>
 
     {% if not session or session.status != 'LIVE' %}
-    <div class="panel mb-3">
-        <form method="post">
+    <div class="panel">
+        <p class="text-muted small mb-3">
+            Sarlavha va efir havolasini kiriting (YouTube jonli efir yoki Telegram havolasi), so‘ng
+            <strong>faollashtiring</strong> — barcha foydalanuvchiga darhol bildirishnoma boradi.
+        </p>
+        <form method="post" class="live-host-form">
             {% csrf_token %}
             <input type="hidden" name="action" value="start">
-            <label class="form-label">Efir sarlavhasi</label>
-            <input type="text" name="title" class="form-control mb-3" placeholder="Masalan: Algebra — kvadrat tenglamalar" maxlength="200">
-            <button type="submit" class="btn btn-primary">Jonli efirni boshlash</button>
+
+            <label class="form-label">Dars nomi</label>
+            <input type="text" name="title" class="form-control mb-3" placeholder="Masalan: Algebra — kvadrat tenglamalar" maxlength="200" required>
+
+            <label class="form-label">Platforma</label>
+            <div class="platform-picker">
+                <input type="radio" name="platform" id="platform-youtube" value="YOUTUBE" checked>
+                <label for="platform-youtube"><i class="bi bi-youtube"></i> YouTube</label>
+                <input type="radio" name="platform" id="platform-telegram" value="TELEGRAM">
+                <label for="platform-telegram"><i class="bi bi-telegram"></i> Telegram</label>
+            </div>
+
+            <label class="form-label">Efir havolasi</label>
+            <input type="url" name="stream_url" class="form-control mb-3" placeholder="https://youtube.com/live/... yoki https://t.me/..." required>
+
+            <button type="submit" class="btn btn-primary w-100">Jonli efirni faollashtirish</button>
         </form>
     </div>
     {% else %}
-    <div class="live-layout">
-        <div class="live-stage panel">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong>{{ session.title }}</strong>
-                <span class="live-badge">LIVE</span>
-            </div>
-            <div class="live-video-wrap">
-                <video id="live-local" autoplay muted playsinline></video>
-            </div>
-            <form method="post" class="mt-3">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="end">
-                <button type="submit" class="btn btn-outline-danger btn-sm">Efirni yakunlash</button>
-            </form>
-            <p class="small text-muted mt-2 mb-0">Kamera/mikrofon ruxsatini bering. Tomoshabinlar `/live/` da ko‘radi.</p>
+    <div class="panel live-card">
+        <div class="live-host-live__badge-row">
+            <span class="live-badge">JONLI</span>
+            <span class="live-card__platform {% if session.platform == 'TELEGRAM' %}is-telegram{% else %}is-youtube{% endif %}">
+                <i class="bi {% if session.platform == 'TELEGRAM' %}bi-telegram{% else %}bi-youtube{% endif %}"></i>
+                {{ session.get_platform_display }}
+            </span>
         </div>
-        <aside class="live-chat panel">
-            <h2 class="h6 fw-bold mb-2">Chat (javob bering)</h2>
-            <div id="live-chat-log" class="live-chat__log">
-                {% for m in chat_messages %}
-                <div class="live-chat__item {% if m.is_from_teacher %}is-teacher{% endif %}">
-                    <strong>{{ m.user.get_full_name|default:m.user.username }}</strong>
-                    <span>{{ m.text }}</span>
-                    <small>{{ m.created_at|date:"H:i" }}</small>
-                </div>
-                {% endfor %}
-            </div>
-            <form id="live-chat-form" class="live-chat__form mt-2" data-no-loader="1">
-                {% csrf_token %}
-                <input type="text" id="live-chat-input" class="form-control" maxlength="500" placeholder="Javob yozing…" autocomplete="off">
-                <button type="submit" class="btn btn-primary btn-sm">Yuborish</button>
-            </form>
-        </aside>
+        <h1 class="live-card__title">{{ session.title }}</h1>
+        <p class="live-card__meta">Foydalanuvchilar shu havola orqali efirga kirishadi:</p>
+        <a href="{{ session.stream_url }}" target="_blank" rel="noopener" class="btn-go mb-3">
+            Havolani ochish <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="end">
+            <button type="submit" class="btn btn-outline-danger btn-sm">Efirni yakunlash</button>
+        </form>
     </div>
     {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_js %}
-{% if session and session.status == 'LIVE' %}
-<script>
-window.XYZ_LIVE = {
-  role: 'host',
-  sessionId: {{ session.pk }},
-  wsPath: '/ws/live/{{ session.pk }}/',
-  canChat: true
-};
-</script>
-<script src="{% static 'js/live.js' %}?v=3"></script>
-{% endif %}
 {% endblock %}

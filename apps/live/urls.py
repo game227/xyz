@@ -7,5 +7,4 @@ app_name = 'live'
 urlpatterns = [
     path('', views.live_watch, name='watch'),
     path('host/', views.live_host, name='host'),
-    path('<int:pk>/chat/', views.live_chat_post, name='chat_post'),
 ]

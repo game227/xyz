@@ -2,85 +2,63 @@
 {% load static %}
 {% block title %}Jonli dars — {{ SITE_NAME }}{% endblock %}
 {% block extra_css %}
-<link href="{% static 'css/live.css' %}?v=2" rel="stylesheet">
+<link href="{% static 'css/live.css' %}?v=4" rel="stylesheet">
 {% endblock %}
 {% block content %}
-<div class="container py-4 live-page">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <div>
-            <p class="section-kicker mb-1">Jonli efir</p>
-            <h1 class="h3 fw-bold mb-0">{% if session %}{{ session.title }}{% else %}Hozircha efir yo‘q{% endif %}</h1>
-        </div>
-        <div class="d-flex gap-2">
-            {% if session and session.status == 'LIVE' %}
-                <span class="live-badge">LIVE</span>
-            {% endif %}
-            {% if user.is_authenticated and user.can_manage_content %}
-                <a href="{% url 'live:host' %}" class="btn btn-ghost btn-sm">Efir boshqaruvi</a>
-            {% endif %}
-        </div>
+<div class="container py-4 live-page mx-auto">
+    <div class="mb-3 text-center">
+        <p class="section-kicker mb-1">Jonli dars</p>
+        {% if user.can_manage_content %}
+        <a href="{% url 'live:host' %}" class="btn btn-ghost btn-sm">Efir boshqaruvi</a>
+        {% endif %}
     </div>
 
-    <div class="live-layout">
-        <div class="live-stage panel">
-            <div class="live-video-wrap">
-                <video id="live-remote" autoplay playsinline muted></video>
-                <button type="button" id="live-unmute" class="live-unmute" hidden>Ovozni yoqish</button>
-                <div id="live-placeholder" class="live-placeholder">
-                    {% if session and session.status == 'LIVE' %}
-                        Efirga ulanilmoqda…
-                    {% elif session %}
-                        Oxirgi efir yakunlangan. Keyingi darsni kuting.
-                    {% else %}
-                        Hozircha jonli dars yo‘q.
-                    {% endif %}
-                </div>
-            </div>
-            {% if session %}
-            <p class="small text-muted mt-2 mb-0">
+    <div class="panel live-card">
+        {% if session and session.status == 'LIVE' %}
+            <div class="mb-2 text-center"><span class="live-badge">JONLI</span></div>
+            <h1 class="live-card__title text-center">{{ session.title }}</h1>
+            <p class="live-card__meta text-center">
                 O‘qituvchi: <strong>{{ session.host.get_full_name|default:session.host.username }}</strong>
-                · {{ session.get_status_display }}
+                <br>
+                <span class="live-card__platform {% if session.platform == 'TELEGRAM' %}is-telegram{% else %}is-youtube{% endif %}">
+                    <i class="bi {% if session.platform == 'TELEGRAM' %}bi-telegram{% else %}bi-youtube{% endif %}"></i>
+                    {{ session.get_platform_display }}da efirda
+                </span>
             </p>
-            {% endif %}
-        </div>
 
-        <aside class="live-chat panel">
-            <h2 class="h6 fw-bold mb-2">Chat</h2>
-            <div id="live-chat-log" class="live-chat__log">
-                {% for m in chat_messages %}
-                <div class="live-chat__item {% if m.is_from_teacher %}is-teacher{% endif %}">
-                    <strong>{{ m.user.get_full_name|default:m.user.username }}</strong>
-                    <span>{{ m.text }}</span>
-                    <small>{{ m.created_at|date:"H:i" }}</small>
-                </div>
-                {% empty %}
-                <p class="text-muted small mb-0" id="chat-empty">Hali xabar yo‘q.</p>
-                {% endfor %}
+            {% if session.youtube_embed_url %}
+            <div class="live-embed-wrap">
+                <iframe
+                    src="{{ session.youtube_embed_url }}"
+                    title="{{ session.title }}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
             </div>
-            {% if user.is_authenticated and session and session.status == 'LIVE' %}
-            <form id="live-chat-form" class="live-chat__form mt-2" data-no-loader="1">
-                {% csrf_token %}
-                <input type="text" id="live-chat-input" class="form-control" maxlength="500" placeholder="Savolingizni yozing…" autocomplete="off">
-                <button type="submit" class="btn btn-primary btn-sm">Yuborish</button>
-            </form>
-            {% elif session and session.status != 'LIVE' %}
-            <p class="small text-muted mt-2 mb-0">Efir yakunlangan — chat yopiq.</p>
+            <a href="{{ session.stream_url }}" target="_blank" rel="noopener" class="btn-go-secondary">
+                YouTube'da ochish <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+            {% else %}
+            <div class="live-card__icon is-live">
+                <i class="bi {% if session.platform == 'TELEGRAM' %}bi-telegram{% else %}bi-youtube{% endif %}"></i>
+            </div>
+            <a href="{{ session.stream_url }}" target="_blank" rel="noopener" class="btn-go">
+                Efirga o‘tish <i class="bi bi-box-arrow-up-right"></i>
+            </a>
             {% endif %}
-        </aside>
+        {% elif session %}
+            <div class="live-card__icon is-idle"><i class="bi bi-clock-history"></i></div>
+            <h1 class="live-card__title">Efir hozircha yopiq</h1>
+            <p class="live-card__meta">
+                Oxirgi dars: <strong>{{ session.title }}</strong> — yakunlangan.<br>
+                Keyingi jonli darsni kuting, boshlanganda sizga bildirishnoma yuboriladi.
+            </p>
+        {% else %}
+            <div class="live-card__icon is-idle"><i class="bi bi-broadcast"></i></div>
+            <h1 class="live-card__title">Hozircha jonli dars yo‘q</h1>
+            <p class="live-card__meta">O‘qituvchi jonli darsni boshlaganda shu sahifada havola paydo bo‘ladi va sizga bildirishnoma yuboriladi.</p>
+        {% endif %}
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-{% if session and session.status == 'LIVE' %}
-<script>
-window.XYZ_LIVE = {
-  role: 'viewer',
-  sessionId: {{ session.pk }},
-  wsPath: '/ws/live/{{ session.pk }}/',
-  canChat: {{ user.is_authenticated|yesno:"true,false" }}
-};
-</script>
-<script src="{% static 'js/live.js' %}?v=3"></script>
-{% endif %}
 {% endblock %}

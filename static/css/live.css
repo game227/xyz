@@ -1,55 +1,51 @@
-/* XYZ Live — stage + chat */
-.live-stage { min-width: 0; }
-.live-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
-  gap: 1rem;
-}
-@media (max-width: 900px) {
-  .live-layout { grid-template-columns: 1fr; }
-}
-.live-video-wrap {
+/* XYZ Live — endi tashqi havola (YouTube/Telegram) orqali, chatsiz, bitta markaziy karta */
+
+.live-page { max-width: 720px; }
+
+.live-card {
   position: relative;
-  aspect-ratio: 16 / 9;
-  background: #070b18;
-  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(201, 162, 39, 0.25);
-  box-shadow: 0 0 40px rgba(99, 102, 241, 0.18);
-}
-.live-video-wrap video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #000;
-}
-.live-unmute {
-  position: absolute;
-  right: 0.75rem;
-  bottom: 0.75rem;
-  z-index: 2;
-  border: 0;
-  border-radius: 999px;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #0b1024;
-  background: #f5d76e;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  cursor: pointer;
-}
-.live-unmute[hidden] { display: none !important; }
-.live-placeholder {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
   text-align: center;
-  color: rgba(226, 232, 255, 0.85);
-  background: linear-gradient(145deg, #0b1024, #1a1040);
+  padding: 2.5rem 1.75rem;
+  background: linear-gradient(160deg, #12102e, #1e1b4b 55%, #0f172a);
+  border: 1px solid rgba(201, 162, 39, 0.22);
 }
+.live-card::before {
+  content: '';
+  position: absolute;
+  inset: -40% -20% auto -20%;
+  height: 60%;
+  background: radial-gradient(closest-side, rgba(99, 102, 241, 0.35), transparent 70%);
+  pointer-events: none;
+}
+
+.live-card__icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+  font-size: 2.1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+}
+.live-card__icon.is-live {
+  color: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+  animation: liveIconPulse 1.8s ease-out infinite;
+}
+.live-card__icon.is-idle { color: var(--muted); }
+@keyframes liveIconPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
 .live-badge {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -73,35 +69,110 @@
   0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55); }
   50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
 }
-.live-chat {
-  display: flex;
-  flex-direction: column;
-  min-height: 360px;
-  max-height: 70vh;
+
+.live-card__title { position: relative; font-size: 1.4rem; font-weight: 800; margin: 0.25rem 0 0.35rem; }
+.live-card__meta { position: relative; color: var(--muted); font-size: 0.9rem; margin-bottom: 1.4rem; }
+.live-card__platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  font-weight: 600;
 }
-.live-chat__log {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding-right: 0.25rem;
-}
-.live-chat__item {
-  padding: 0.55rem 0.7rem;
-  border-radius: 10px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  font-size: 0.9rem;
-}
-.live-chat__item strong { display: block; font-size: 0.78rem; margin-bottom: 0.15rem; }
-.live-chat__item small { display: block; opacity: 0.55; margin-top: 0.2rem; font-size: 0.7rem; }
-.live-chat__item.is-teacher {
-  background: rgba(201, 162, 39, 0.12);
-  border-color: rgba(201, 162, 39, 0.35);
-}
-.live-chat__form {
-  display: flex;
+.live-card__platform.is-youtube { color: #ff6b6b; }
+.live-card__platform.is-telegram { color: var(--cyan); }
+
+.live-card .btn-go {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: #0b1024;
+  border: none;
+  box-shadow: 0 12px 28px rgba(240, 215, 140, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.live-chat__form .form-control { flex: 1; }
+.live-card .btn-go:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgba(240, 215, 140, 0.35);
+  color: #0b1024;
+}
+
+/* ——— Platforma ichida ko'rsatiladigan YouTube efir (embed) ——— */
+.live-embed-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto 1.25rem;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: 0 20px 45px rgba(5, 10, 25, 0.45);
+  background: #000;
+}
+.live-embed-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.live-card .btn-go-secondary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.live-card .btn-go-secondary:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+@media (max-width: 576px) {
+  .live-embed-wrap { border-radius: 12px; }
+}
+
+/* ——— Host: efirni boshqarish formasi ——— */
+.live-host-form { max-width: 480px; margin: 0 auto; }
+.platform-picker { display: flex; gap: 0.6rem; margin-bottom: 1rem; }
+.platform-picker input { position: absolute; opacity: 0; pointer-events: none; }
+.platform-picker label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.5rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.platform-picker input:checked + label {
+  border-color: var(--gold);
+  background: rgba(240, 215, 140, 0.12);
+}
+.platform-picker label i.bi-youtube { color: #ff6b6b; }
+.platform-picker label i.bi-telegram { color: var(--cyan); }
+
+.live-host-live__badge-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
