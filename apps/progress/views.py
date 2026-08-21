@@ -53,10 +53,21 @@ def save_watch_progress_view(request, lesson_pk):
 
 @login_required
 def dashboard_view(request):
+    from django.utils import timezone
+
     from apps.subscription.access import get_freemium_lesson
     from apps.subscription.services import get_active_subscription
 
     context = get_dashboard_context(request.user)
-    context['subscription'] = get_active_subscription(request.user)
+    subscription = get_active_subscription(request.user)
+    context['subscription'] = subscription
     context['free_lesson'] = get_freemium_lesson()
+
+    days_left = None
+    expiring_soon = False
+    if subscription and subscription.is_currently_active():
+        days_left = (subscription.end_date - timezone.localdate()).days
+        expiring_soon = 0 <= days_left <= 5
+    context['subscription_days_left'] = days_left
+    context['subscription_expiring_soon'] = expiring_soon
     return render(request, 'progress/dashboard.html', context)

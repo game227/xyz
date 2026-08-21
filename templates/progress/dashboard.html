@@ -12,9 +12,19 @@
     </div>
 
     {% if subscription and subscription.is_currently_active %}
+        {% if subscription_expiring_soon %}
+        <div class="alert alert-warning small d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>
+                Obunangiz <strong>{{ subscription.end_date|date:"d.m.Y" }}</strong> da tugaydi
+                ({{ subscription_days_left }} kun qoldi). Uzluksiz kirish uchun uzaytiring.
+            </span>
+            <a href="{% url 'subscription:info' %}" class="btn btn-sm btn-primary">Obuna sahifasi</a>
+        </div>
+        {% else %}
         <div class="alert alert-success small">
             Obunangiz faol — {{ subscription.end_date|date:"d.m.Y" }} gacha amal qiladi.
         </div>
+        {% endif %}
     {% else %}
         <div class="alert alert-warning small d-flex justify-content-between align-items-center flex-wrap gap-2">
             <span>Faol obuna yo‘q. Bepul dars ixtiyoriy — to‘liq kontent uchun tarif so‘rang.</span>
@@ -80,17 +90,36 @@
     </div>
     {% endif %}
 
-    {% if progress_chart %}
-    <h2 class="h5 fw-bold mb-3">Oylik o‘rtacha ball</h2>
-    <div class="panel mb-4 reveal">
-        <div class="mini-chart">
-            {% for point in progress_chart %}
-            <div class="mini-chart__col" title="{{ point.label }}: {{ point.avg_score }}%">
-                <div class="mini-chart__bar" style="height: {{ point.avg_score }}%"></div>
-                <span>{{ point.label }}</span>
+    <h2 class="h5 fw-bold mb-3">Progress diagrammalari</h2>
+    {% if has_chart_data %}
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="panel reveal chart-panel">
+                <h3 class="h6 fw-bold mb-3">Oylik o‘rtacha ball</h3>
+                {% if progress_chart %}
+                <canvas id="xyz-monthly-chart" height="220"
+                    data-labels='[{% for p in progress_chart %}"{{ p.label }}"{% if not forloop.last %},{% endif %}{% endfor %}]'
+                    data-scores='[{% for p in progress_chart %}{{ p.avg_score }}{% if not forloop.last %},{% endif %}{% endfor %}]'
+                    data-attempts='[{% for p in progress_chart %}{{ p.attempts }}{% if not forloop.last %},{% endif %}{% endfor %}]'></canvas>
+                {% else %}
+                <p class="text-muted small mb-0">Oylik ma’lumot hali yetarli emas.</p>
+                {% endif %}
             </div>
-            {% endfor %}
         </div>
+        <div class="col-lg-6">
+            <div class="panel reveal chart-panel" style="--delay:1">
+                <h3 class="h6 fw-bold mb-3">Haftalik faollik</h3>
+                <canvas id="xyz-weekly-chart" height="220"
+                    data-labels='[{% for p in weekly_chart %}"{{ p.label }}"{% if not forloop.last %},{% endif %}{% endfor %}]'
+                    data-attempts='[{% for p in weekly_chart %}{{ p.attempts }}{% if not forloop.last %},{% endif %}{% endfor %}]'
+                    data-lessons='[{% for p in weekly_chart %}{{ p.lessons_completed }}{% if not forloop.last %},{% endif %}{% endfor %}]'
+                    data-scores='[{% for p in weekly_chart %}{{ p.avg_score }}{% if not forloop.last %},{% endif %}{% endfor %}]'></canvas>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="panel mb-4 reveal">
+        <p class="text-muted mb-0">Hali test topshirmadingiz. Bepul darsni ko‘rib, testdan o‘ting — diagrammalar shu yerda paydo bo‘ladi.</p>
     </div>
     {% endif %}
 
@@ -118,4 +147,87 @@
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if has_chart_data %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--muted').trim() || '#94a3b8';
+  const cyan = getComputedStyle(document.documentElement).getPropertyValue('--cyan').trim() || '#38bdf8';
+  const indigo = getComputedStyle(document.documentElement).getPropertyValue('--indigo').trim() || '#6366f1';
+  const gold = getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#c9a227';
+
+  function parseJsonAttr(el, name) {
+    try { return JSON.parse(el.getAttribute(name) || '[]'); } catch (e) { return []; }
+  }
+
+  const monthly = document.getElementById('xyz-monthly-chart');
+  if (monthly && window.Chart) {
+    new Chart(monthly, {
+      type: 'bar',
+      data: {
+        labels: parseJsonAttr(monthly, 'data-labels'),
+        datasets: [{
+          label: "O‘rtacha ball (%)",
+          data: parseJsonAttr(monthly, 'data-scores'),
+          backgroundColor: cyan,
+          borderRadius: 6,
+          maxBarThickness: 36,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: 'rgba(148,163,184,0.15)' } },
+          x: { ticks: { color: textColor }, grid: { display: false } },
+        },
+      },
+    });
+  }
+
+  const weekly = document.getElementById('xyz-weekly-chart');
+  if (weekly && window.Chart) {
+    new Chart(weekly, {
+      type: 'line',
+      data: {
+        labels: parseJsonAttr(weekly, 'data-labels'),
+        datasets: [
+          {
+            label: 'Test urinishlari',
+            data: parseJsonAttr(weekly, 'data-attempts'),
+            borderColor: indigo,
+            backgroundColor: 'rgba(99,102,241,0.15)',
+            tension: 0.3,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Tugatilgan darslar',
+            data: parseJsonAttr(weekly, 'data-lessons'),
+            borderColor: gold,
+            backgroundColor: 'rgba(201,162,39,0.12)',
+            tension: 0.3,
+            yAxisID: 'y',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: textColor, boxWidth: 12 } },
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: 'rgba(148,163,184,0.15)' } },
+          x: { ticks: { color: textColor }, grid: { display: false } },
+        },
+      },
+    });
+  }
+})();
+</script>
+{% endif %}
 {% endblock %}

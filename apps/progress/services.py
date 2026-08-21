@@ -196,7 +196,27 @@ def get_dashboard_context(user):
             'courses': course_rows,
         })
 
-    # Oxirgi 6 oy urinishlari — oddiy chart
+    progress_chart = _monthly_progress_chart(user)
+    weekly_chart = _weekly_progress_chart(user)
+
+    return {
+        'overall_progress': overall_progress_percent(user),
+        'completed_topics_count': completed_topics_count,
+        'last_lesson': last_lesson_progress.lesson if last_lesson_progress else None,
+        'recent_attempts': recent_attempts,
+        'subject_progress': subject_rows,
+        'progress_chart': progress_chart,
+        'weekly_chart': weekly_chart,
+        'has_chart_data': bool(progress_chart) or any(
+            p['attempts'] or p['lessons_completed'] for p in weekly_chart
+        ),
+    }
+
+
+def _monthly_progress_chart(user):
+    """Oxirgi 6 oy — o‘rtacha test balli va urinishlar soni."""
+    import datetime
+
     from django.db.models.functions import TruncMonth
 
     from apps.exam.models import ExamAttempt
@@ -208,22 +228,92 @@ def get_dashboard_context(user):
         .annotate(avg_score=Avg('score'), attempts=Count('id'))
         .order_by('month')
     )
-    chart = []
+    by_month = {}
     for row in month_stats:
         if not row['month']:
             continue
-        chart.append({
-            'label': row['month'].strftime('%m.%Y'),
+        key = row['month'].date() if hasattr(row['month'], 'date') else row['month']
+        by_month[key] = {
             'avg_score': round(float(row['avg_score'] or 0), 1),
             'attempts': row['attempts'],
-        })
-    chart = chart[-6:]
+        }
 
-    return {
-        'overall_progress': overall_progress_percent(user),
-        'completed_topics_count': completed_topics_count,
-        'last_lesson': last_lesson_progress.lesson if last_lesson_progress else None,
-        'recent_attempts': recent_attempts,
-        'subject_progress': subject_rows,
-        'progress_chart': chart,
-    }
+    today = timezone.localdate().replace(day=1)
+    chart = []
+    for i in range(5, -1, -1):
+        # Go back i months from current month start
+        year = today.year
+        month = today.month - i
+        while month <= 0:
+            month += 12
+            year -= 1
+        key = datetime.date(year, month, 1)
+        data = by_month.get(key, {'avg_score': 0, 'attempts': 0})
+        if data['attempts'] or key in by_month:
+            chart.append({
+                'label': key.strftime('%m.%Y'),
+                'avg_score': data['avg_score'],
+                'attempts': data['attempts'],
+            })
+    # Only months that had activity (keep chart clean); fall back to empty
+    return [p for p in chart if p['attempts']]
+
+
+def _weekly_progress_chart(user):
+    """Oxirgi 8 hafta — urinishlar, o‘rtacha ball, tugatilgan darslar (bo‘sh haftalar ham)."""
+    import datetime
+
+    from django.db.models.functions import TruncWeek
+
+    from apps.exam.models import ExamAttempt
+
+    today = timezone.localdate()
+    # ISO week start (Monday)
+    week_start = today - datetime.timedelta(days=today.weekday())
+    window_start = week_start - datetime.timedelta(weeks=7)
+
+    attempt_rows = (
+        ExamAttempt.objects.filter(user=user, created_at__date__gte=window_start)
+        .annotate(week=TruncWeek('created_at'))
+        .values('week')
+        .annotate(avg_score=Avg('score'), attempts=Count('id'))
+    )
+    attempts_by_week = {}
+    for row in attempt_rows:
+        if not row['week']:
+            continue
+        key = row['week'].date() if hasattr(row['week'], 'date') else row['week']
+        attempts_by_week[key] = {
+            'avg_score': round(float(row['avg_score'] or 0), 1),
+            'attempts': row['attempts'],
+        }
+
+    lesson_rows = (
+        LessonProgress.objects.filter(
+            user=user,
+            is_completed=True,
+            completed_at__isnull=False,
+            completed_at__date__gte=window_start,
+        )
+        .annotate(week=TruncWeek('completed_at'))
+        .values('week')
+        .annotate(lessons_completed=Count('id'))
+    )
+    lessons_by_week = {}
+    for row in lesson_rows:
+        if not row['week']:
+            continue
+        key = row['week'].date() if hasattr(row['week'], 'date') else row['week']
+        lessons_by_week[key] = row['lessons_completed']
+
+    chart = []
+    for i in range(7, -1, -1):
+        key = week_start - datetime.timedelta(weeks=i)
+        att = attempts_by_week.get(key, {'avg_score': 0, 'attempts': 0})
+        chart.append({
+            'label': key.strftime('%d.%m'),
+            'avg_score': att['avg_score'],
+            'attempts': att['attempts'],
+            'lessons_completed': lessons_by_week.get(key, 0),
+        })
+    return chart
