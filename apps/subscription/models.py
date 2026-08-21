@@ -31,6 +31,14 @@ class Subscription(TimeStampedModel):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='activated_subscriptions', verbose_name='kim tomonidan faollashtirilgan',
     )
+    expiry_reminder_sent_at = models.DateTimeField(
+        null=True, blank=True, verbose_name='tugash haqida ogohlantirilgan vaqt',
+        help_text='Tugashiga 5 kun qolganda avtomatik bildirishnoma yuborilgach to‘ldiriladi.',
+    )
+    expiry_final_reminder_sent_at = models.DateTimeField(
+        null=True, blank=True, verbose_name='1 kunlik ogohlantirish vaqti',
+        help_text='Tugashiga 1 kun qolganda yakuniy eslatma yuborilgach to‘ldiriladi.',
+    )
 
     class Meta:
         verbose_name = 'Obuna'

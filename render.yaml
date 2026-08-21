@@ -7,8 +7,14 @@ services:
     name: xyz
     runtime: python
     plan: free
+    # autoDeploy: true — GitHub'dagi ulangan branchga har push qilganingizda
+    # Render avtomatik ravishda yangi kodni tortib oladi, buildCommand'ni
+    # qayta ishga tushiradi va serverni qayta ishga tushirib, yangi versiyani chiqaradi.
+    autoDeploy: true
+    branch: main
     buildCommand: chmod +x build.sh && ./build.sh
     startCommand: daphne -b 0.0.0.0 -p $PORT config.asgi:application
+    healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
         value: "3.13.0"
@@ -26,3 +32,23 @@ services:
         fromDatabase:
           name: xyz-db
           property: connectionString
+
+# Obuna tugashi haqida kunlik eslatma (5 kun + 1 kun).
+  - type: cron
+    name: xyz-send-expiry-reminders
+    runtime: python
+    plan: free
+    schedule: "0 3 * * *"  # har kuni 03:00 UTC (Toshkent vaqti bilan 08:00)
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: python manage.py send_expiry_reminders
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.0"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: xyz-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"

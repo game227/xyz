@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.contrib import messages
 from django.utils.html import format_html
 
 from .models import ContactChannel, Subscription, SubscriptionPricing, SubscriptionRequest
+from .services import activate_subscription
 
 
 @admin.register(Subscription)
@@ -70,10 +72,47 @@ class SubscriptionPricingAdmin(admin.ModelAdmin):
 @admin.register(SubscriptionRequest)
 class SubscriptionRequestAdmin(admin.ModelAdmin):
     list_display = (
-        'full_name', 'phone', 'telegram', 'plan_days', 'status', 'user', 'created_at',
+        'full_name', 'phone', 'telegram', 'plan_days', 'status',
+        'user_linked', 'user', 'created_at',
     )
     list_filter = ('status', 'plan_days', 'created_at')
     search_fields = ('full_name', 'phone', 'telegram', 'user__username')
     list_editable = ('status',)
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('-created_at',)
+    list_select_related = ('user',)
+    actions = ['approve_and_activate', 'reject_requests']
+
+    @admin.display(description='Foydalanuvchi', boolean=True)
+    def user_linked(self, obj):
+        return bool(obj.user_id)
+
+    @admin.action(description='So‘rovni tasdiqlab obuna berish')
+    def approve_and_activate(self, request, queryset):
+        activated = 0
+        skipped = 0
+        for req in queryset.select_related('user'):
+            if not req.user_id:
+                skipped += 1
+                continue
+            activate_subscription(req.user, req.plan_days, request.user)
+            req.status = SubscriptionRequest.Status.DONE
+            req.save(update_fields=['status', 'updated_at'])
+            activated += 1
+        if activated:
+            self.message_user(
+                request,
+                f'{activated} ta so‘rov tasdiqlandi va obuna berildi.',
+                messages.SUCCESS,
+            )
+        if skipped:
+            self.message_user(
+                request,
+                f'{skipped} ta so‘rovda foydalanuvchi bog‘lanmagan — o‘tkazib yuborildi.',
+                messages.WARNING,
+            )
+
+    @admin.action(description='Rad etish')
+    def reject_requests(self, request, queryset):
+        updated = queryset.update(status=SubscriptionRequest.Status.REJECTED)
+        self.message_user(request, f'{updated} ta so‘rov rad etildi.')

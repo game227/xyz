@@ -90,14 +90,18 @@ def activate_subscription(user, duration_days, activated_by):
             current.end_date = end_date
             current.duration_days = (end_date - start_date).days
             current.activated_by = activated_by
+            current.expiry_reminder_sent_at = None
+            current.expiry_final_reminder_sent_at = None
             current.save(update_fields=[
-                'end_date', 'duration_days', 'activated_by', 'updated_at',
+                'end_date', 'duration_days', 'activated_by',
+                'expiry_reminder_sent_at', 'expiry_final_reminder_sent_at', 'updated_at',
             ])
             logger.info(
                 'SUBSCRIPTION_EXTENDED: user=%s +%s days → %s by=%s',
                 user.username, duration_days, end_date,
                 getattr(activated_by, 'username', 'unknown'),
             )
+            _notify_subscription_activated(current)
             return current
 
     start_date = today
@@ -114,7 +118,26 @@ def activate_subscription(user, duration_days, activated_by):
         'SUBSCRIPTION_ACTIVATED: user=%s days=%s by=%s',
         user.username, duration_days, getattr(activated_by, 'username', 'unknown'),
     )
+    _notify_subscription_activated(subscription)
     return subscription
+
+
+def _notify_subscription_activated(subscription):
+    """Obuna faollashganda foydalanuvchiga bildirishnoma yuboradi (boshlanish/tugash sanasi bilan)."""
+    from django.urls import reverse
+
+    from apps.core.services import notify_user
+
+    notify_user(
+        subscription.user,
+        ntype='SUB_ACTIVATED',
+        title='Obuna faollashtirildi',
+        message=(
+            f'Obunangiz {subscription.start_date:%d.%m.%Y} sanada faollashtirildi va '
+            f'{subscription.end_date:%d.%m.%Y} sanagacha amal qiladi.'
+        ),
+        url=reverse('subscription:info'),
+    )
 
 
 def create_subscription_request(*, user, full_name, phone, telegram, plan_days, note):
