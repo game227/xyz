@@ -7,9 +7,33 @@ from django.utils import timezone
 
 from apps.exam.models import ExamAttempt
 
-from .models import Founder, StudentOfTheMonth
+from .models import Founder, Notification, StudentOfTheMonth
 
 User = get_user_model()
+
+
+def notify_user(user, ntype, title, message='', url=''):
+    """Bitta foydalanuvchiga bildirishnoma yaratadi."""
+    return Notification.objects.create(
+        user=user, ntype=ntype, title=title, message=message, url=url,
+    )
+
+
+def notify_many(users, ntype, title, message='', url=''):
+    """Bir nechta foydalanuvchiga bir xil bildirishnoma yuboradi (bulk)."""
+    notifications = [
+        Notification(user=u, ntype=ntype, title=title, message=message, url=url)
+        for u in users
+    ]
+    return Notification.objects.bulk_create(notifications)
+
+
+def notify_all_active_users(ntype, title, message='', url='', exclude_user_id=None):
+    """Barcha faol foydalanuvchilarga bildirishnoma yuboradi (masalan, jonli dars boshlanganda)."""
+    qs = User.objects.filter(is_active=True)
+    if exclude_user_id:
+        qs = qs.exclude(pk=exclude_user_id)
+    return notify_many(qs, ntype, title, message=message, url=url)
 
 
 def get_active_founders():

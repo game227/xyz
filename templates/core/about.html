@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Platforma haqida — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width: 880px;">
+        <p class="section-kicker">{{ SITE_NAME }}</p>
+        <h1 class="section-title">Platforma haqida</h1>
+        <p class="section-lead" style="max-width: 100%;">
+            {{ SITE_NAME }} — {{ SITE_TAGLINE }}. Bu yerda o‘quvchi bitta joyda video darslarni ko‘radi,
+            test yechadi, o‘z natijasini kuzatadi va jonli darslarda qatnashadi.
+        </p>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <i class="bi bi-play-btn fs-3" style="color: var(--gold);"></i>
+                    <h2 class="h6 fw-bold mt-2">Video darslar</h2>
+                    <p class="small text-muted mb-0">Fanlar mavzularga bo‘lingan — har bir mavzu qisqa video tushuntirish bilan beriladi.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <i class="bi bi-pencil-square fs-3" style="color: var(--gold);"></i>
+                    <h2 class="h6 fw-bold mt-2">Testlar va imtihonlar</h2>
+                    <p class="small text-muted mb-0">Har bir mavzu oxirida test bor, natija darhol chiqadi va shaxsiy kabinetda saqlanadi.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <i class="bi bi-broadcast fs-3" style="color: var(--gold);"></i>
+                    <h2 class="h6 fw-bold mt-2">Jonli darslar</h2>
+                    <p class="small text-muted mb-0">O‘qituvchi e’lon qilgan vaqtda YouTube yoki Telegramda jonli efir orqali dars o‘tiladi; boshlanganda barcha foydalanuvchiga bildirishnoma boradi.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <i class="bi bi-bar-chart fs-3" style="color: var(--gold);"></i>
+                    <h2 class="h6 fw-bold mt-2">Reyting</h2>
+                    <p class="small text-muted mb-0">Oylik natijalar bo‘yicha eng faol va yuqori ballli o‘quvchilar reytingda ko‘rsatiladi.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <i class="bi bi-patch-check fs-3" style="color: var(--gold);"></i>
+                    <h2 class="h6 fw-bold mt-2">Obuna</h2>
+                    <p class="small text-muted mb-0">To‘liq kirish obuna orqali ochiladi; obuna faollashganda va tugashiga 5 kun qolganda bildirishnoma yuboriladi.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <i class="bi bi-people fs-3" style="color: var(--gold);"></i>
+                    <h2 class="h6 fw-bold mt-2">O‘qituvchilar</h2>
+                    <p class="small text-muted mb-0">Har bir o‘qituvchining profili, tajribasi va o‘quvchilar bahosi ko‘rinib turadi.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel mt-4">
+            <h2 class="h6 fw-bold">Qanday boshlash mumkin?</h2>
+            <ol class="small text-muted mb-0 ps-3">
+                <li class="mb-1">Ro‘yxatdan o‘ting va profilingizni to‘ldiring.</li>
+                <li class="mb-1">Obunani faollashtiring — sizga mos tarifni tanlang.</li>
+                <li class="mb-1">Fan va mavzuni tanlab, video darsni ko‘ring va testni yeching.</li>
+                <li>Jonli darslarni va reytingni kuzatib boring — bildirishnomalar sizni xabardor qilib turadi.</li>
+            </ol>
+        </div>
+
+        {% if not user.is_authenticated %}
+        <div class="text-center mt-4">
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">Ro‘yxatdan o‘tish</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

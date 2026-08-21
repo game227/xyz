@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Founder, SiteSettings, StudentOfTheMonth
+from .models import Founder, Notification, SiteSettings, StudentOfTheMonth
 
 
 @admin.register(SiteSettings)
@@ -93,3 +93,13 @@ class StudentOfTheMonthAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user',)
     ordering = ('-year', '-month')
     readonly_fields = ('created_at', 'updated_at')
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'ntype', 'title', 'is_read', 'created_at')
+    list_filter = ('ntype', 'is_read')
+    search_fields = ('user__username', 'title', 'message')
+    autocomplete_fields = ('user',)
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('-created_at',)

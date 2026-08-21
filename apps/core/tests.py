@@ -1,10 +1,17 @@
 """Integration tests for XYZ freemium + per-lesson 10-question exams."""
+import datetime
+from io import StringIO
+
 from django.conf import settings
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.accounts.models import CustomUser
+from apps.core.models import Notification
 from apps.education.models import Course, Lesson, Module, Subject, Topic
 from apps.exam.constants import QUESTIONS_PER_LESSON
 from apps.exam.models import Answer, ExamSettings, Question
@@ -14,6 +21,7 @@ from apps.subscription.access import (
     can_access_lesson,
     get_freemium_lesson,
 )
+from apps.subscription.models import Subscription
 from apps.subscription.services import activate_subscription
 
 
@@ -125,3 +133,55 @@ class FreemiumFlowTests(TestCase):
         response = self.client.get(reverse('core:home'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'XYZ')
+
+
+class ExpiryReminderCommandTests(TestCase):
+    def setUp(self):
+        self.admin = CustomUser.objects.create_superuser(
+            username='admin_r', email='ar@xyz.uz', password='admin12345'
+        )
+        self.user5 = CustomUser.objects.create_user(
+            username='u5', email='u5@xyz.uz', password='pass12345'
+        )
+        self.user1 = CustomUser.objects.create_user(
+            username='u1', email='u1@xyz.uz', password='pass12345'
+        )
+        today = timezone.localdate()
+        Subscription.objects.create(
+            user=self.user5,
+            start_date=today - datetime.timedelta(days=25),
+            end_date=today + datetime.timedelta(days=5),
+            duration_days=30,
+            status=Subscription.Status.ACTIVE,
+            activated_by=self.admin,
+        )
+        Subscription.objects.create(
+            user=self.user1,
+            start_date=today - datetime.timedelta(days=29),
+            end_date=today + datetime.timedelta(days=1),
+            duration_days=30,
+            status=Subscription.Status.ACTIVE,
+            activated_by=self.admin,
+        )
+
+    def test_sends_5_and_1_day_reminders_once(self):
+        out = StringIO()
+        call_command('send_expiry_reminders', stdout=out)
+        self.assertEqual(
+            Notification.objects.filter(user=self.user5, ntype='SUB_EXPIRING').count(), 1
+        )
+        self.assertEqual(
+            Notification.objects.filter(user=self.user1, ntype='SUB_EXPIRING').count(), 1
+        )
+        self.assertEqual(len(mail.outbox), 2)
+
+        sub5 = Subscription.objects.get(user=self.user5)
+        sub1 = Subscription.objects.get(user=self.user1)
+        self.assertIsNotNone(sub5.expiry_reminder_sent_at)
+        self.assertIsNotNone(sub1.expiry_final_reminder_sent_at)
+
+        call_command('send_expiry_reminders', stdout=out)
+        self.assertEqual(
+            Notification.objects.filter(ntype='SUB_EXPIRING').count(), 2
+        )
+        self.assertEqual(len(mail.outbox), 2)

@@ -165,6 +165,34 @@ def teacher_detail(request, pk):
     })
 
 
+@login_required
+def notifications_list(request):
+    """Foydalanuvchining barcha bildirishnomalari — ochilganda hammasi o‘qilgan deb belgilanadi."""
+    from .models import Notification
+
+    qs = Notification.objects.filter(user=request.user)
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return render(request, 'core/notifications.html', {'notifications': qs})
+
+
+@login_required
+@require_POST
+def notification_read(request, pk):
+    """Bitta bildirishnomani o‘qilgan deb belgilaydi va havolasi bo‘lsa o‘sha yerga o‘tkazadi."""
+    from .models import Notification
+
+    notif = get_object_or_404(Notification, pk=pk, user=request.user)
+    if not notif.is_read:
+        notif.is_read = True
+        notif.save(update_fields=['is_read', 'updated_at'])
+    return redirect(notif.url or 'core:notifications')
+
+
+def about(request):
+    """Platforma haqida qisqa va to‘liq ma’lumot."""
+    return render(request, 'core/about.html', {})
+
+
 def error_404(request, exception=None):
     logger.info('404 Not Found: %s', request.path)
     return render(request, 'errors/404.html', status=404)

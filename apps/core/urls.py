@@ -11,4 +11,7 @@ urlpatterns = [
     path('reyting/oqituvchi/<int:teacher_id>/baho/', views.rate_teacher, name='rate_teacher'),
     path('asoschi/<int:pk>/', views.founder_detail, name='founder_detail'),
     path('oqituvchi/<int:pk>/', views.teacher_detail, name='teacher_detail'),
+    path('platforma-haqida/', views.about, name='about'),
+    path('bildirishnomalar/', views.notifications_list, name='notifications'),
+    path('bildirishnomalar/<int:pk>/oqish/', views.notification_read, name='notification_read'),
 ]

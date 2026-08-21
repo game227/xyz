@@ -5,6 +5,7 @@ created_at / updated_at are always present, per project convention.
 ActivatableModel is opt-in and only mixed in where an is_active toggle
 makes sense (Subject, Course, Topic, Lesson, Question, ...).
 """
+from django.conf import settings
 from django.db import models
 
 
@@ -153,3 +154,47 @@ class StudentOfTheMonth(TimeStampedModel):
 
     def __str__(self):
         return f'{self.year}-{self.month:02d}: {self.user}'
+
+
+class Notification(TimeStampedModel):
+    """Foydalanuvchiga yuboriladigan bildirishnoma (jonli dars, obuna va h.k.).
+
+    Onlayn push/SMS yo‘q — sayt ichidagi "qo‘ng‘iroq" menyusida ko‘rinadi.
+    """
+
+    class NType(models.TextChoices):
+        LIVE_STARTED = 'LIVE_STARTED', 'Jonli dars boshlandi'
+        SUB_ACTIVATED = 'SUB_ACTIVATED', 'Obuna faollashtirildi'
+        SUB_EXPIRING = 'SUB_EXPIRING', 'Obuna tugash arafasida'
+        GENERAL = 'GENERAL', 'Umumiy'
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        verbose_name='foydalanuvchi',
+    )
+    ntype = models.CharField(
+        max_length=20,
+        choices=NType.choices,
+        default=NType.GENERAL,
+        verbose_name='turi',
+    )
+    title = models.CharField(max_length=200, verbose_name='sarlavha')
+    message = models.CharField(max_length=400, blank=True, verbose_name='matn')
+    url = models.CharField(
+        max_length=300, blank=True, verbose_name='havola',
+        help_text='Bosilganda ochiladigan sahifa (ixtiyoriy).',
+    )
+    is_read = models.BooleanField(default=False, verbose_name='o‘qilgan')
+
+    class Meta:
+        verbose_name = 'Bildirishnoma'
+        verbose_name_plural = 'Bildirishnomalar'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+        ]
+
+    def __str__(self):
+        return f'{self.user} — {self.title}'
