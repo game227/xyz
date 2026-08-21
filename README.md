@@ -63,3 +63,23 @@ python manage.py runserver
 - Fanlar: `/education/subjects/`
 - Obuna: `/subscription/info/`
 - Parol tiklash: `/accounts/password-reset/`
+
+## Bildirishnomalar va rejalashtirilgan buyruqlar
+
+Platformada sayt ichi bildirishnoma tizimi bor (navbardagi qo‘ng‘iroq ikonkasi):
+
+- Jonli dars boshlanganda — barcha faol foydalanuvchiga avtomatik yuboriladi.
+- Obuna faollashtirilganda (admin panelda so‘rovdan «tasdiqlab obuna berish» yoki `activate_subscription`) — boshlanish/tugash sanasi bilan.
+- Obuna tugashiga **5 kun** va **1 kun** qolganda — bildirishnoma + email (agar email bor bo‘lsa):
+
+```bash
+python manage.py send_expiry_reminders
+```
+
+Bu buyruq kuniga bir marta ishga tushishi kerak. Render’da `render.yaml` ichidagi cron job (`xyz-send-expiry-reminders`) shu vazifani bajaradi.
+
+## Jonli dars
+
+- `/live/` — mehmonlarga ham ochiq; YouTube yoki Telegram efir havolasi.
+- `/live/host/` — faqat o‘qituvchi/admin efir boshlaydi/tugatadi.
+- WebRTC/WebSocket chat ishlatilmaydi.
