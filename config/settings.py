@@ -70,8 +70,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'channels',
     'widget_tweaks',
+    'storages',
 ]
 
 LOCAL_APPS = [
@@ -120,12 +120,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
 
 # =========================================================
 # DATABASE — DATABASE_URL (Render/Neon) > SQLite > PostgreSQL env
@@ -200,6 +194,38 @@ STORAGES = {
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ---------------------------------------------------------------
+# Media uchun S3-mos ombor (ixtiyoriy).
+#
+# MUHIM: Render (va ko'p PaaS)dagi bepul veb-xizmatlar diskni "vaqtinchalik"
+# saqlaydi — har safar qayta deploy qilinganda (masalan avtomatik GitHub
+# deploy ishga tushganda) serverdagi disk TOZALANADI va shu paytgacha
+# foydalanuvchilar yuklagan barcha rasm/video/logo YO'QOLADI, chunki ular
+# oddiy diskka (MEDIA_ROOT) saqlanadi.
+#
+# Buning oldini olish uchun: AWS S3 yoki S3-mos ombor (Cloudflare R2,
+# Backblaze B2 va h.k.)ni sozlab, quyidagi environment o'zgaruvchilarini
+# beriladi — shunda media fayllar diskdan emas, tashqi, doimiy ombordan
+# xizmat qiladi va har deployda saqlanib qoladi:
+#   AWS_STORAGE_BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,
+#   AWS_S3_REGION_NAME (masalan "auto" yoki "eu-central-1"),
+#   AWS_S3_ENDPOINT_URL (S3 bo'lmagan xizmatlar uchun, masalan R2 uchun kerak)
+# Hech biri berilmasa — hammasi avvalgidek, oddiy diskka saqlanadi (dev uchun bemalol).
+# ---------------------------------------------------------------
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', '').strip()
+if AWS_STORAGE_BUCKET_NAME:
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', '')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', '')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'auto')
+    AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL', '').strip() or None
+    AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN', '').strip() or None
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_FILE_OVERWRITE = False
+    STORAGES['default'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

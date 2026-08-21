@@ -1,20 +1,13 @@
-"""ASGI config for XYZ — HTTP + WebSocket (Channels)."""
+"""ASGI config for XYZ.
+
+Jonli efir WebRTC/WebSocket orqali emas, tashqi havola (YouTube/Telegram)
+orqali ishlaydi — shuning uchun alohida WebSocket marshrutlash kerak emas.
+Daphne shunchaki oddiy Django ASGI ilovasini xizmat qiladi.
+"""
 import os
 
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
-django_asgi_app = get_asgi_application()
-
-from apps.live.routing import websocket_urlpatterns  # noqa: E402
-
-application = ProtocolTypeRouter({
-    'http': django_asgi_app,
-    'websocket': AllowedHostsOriginValidator(
-        AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
-    ),
-})
+application = get_asgi_application()
