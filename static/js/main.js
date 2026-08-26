@@ -99,6 +99,36 @@
     play();
   }
 
+  function scrollProgress() {
+    const bar = document.getElementById('scroll-progress');
+    if (!bar) return;
+    const onScroll = () => {
+      const h = document.documentElement;
+      const scrollTop = h.scrollTop || document.body.scrollTop;
+      const height = h.scrollHeight - h.clientHeight;
+      const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+      bar.style.width = pct + '%';
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  function cardSpotlight() {
+    if (reduce) return;
+    const selector = '.person-card, .feature-item, .subject-tile, .plan-card, .lesson-row';
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        const el = e.target.closest(selector);
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+        el.style.setProperty('--my', `${e.clientY - rect.top}px`);
+      },
+      { passive: true }
+    );
+  }
+
   function pageLoader() {
     const el = document.getElementById('xyz-loader');
     if (!el) return;
@@ -172,6 +202,8 @@
     navScroll();
     scrollToHash();
     lockHeroVideo();
+    scrollProgress();
+    cardSpotlight();
   });
   pageLoader();
   window.addEventListener('hashchange', scrollToHash);

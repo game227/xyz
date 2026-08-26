@@ -177,6 +177,12 @@
     overflow: hidden;
     box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
     animation: pdIn 0.55s ease both;
+    transition: transform 0.35s var(--ease, ease), box-shadow 0.35s var(--ease, ease), border-color 0.35s ease;
+}
+.pd__frame:hover {
+    transform: translateY(-4px);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 22px 46px rgba(0, 0, 0, 0.3), 0 0 32px rgba(99, 102, 241, 0.14);
 }
 
 .pd__frame:nth-child(2) { animation-delay: 0.06s; }
@@ -220,4 +226,11 @@
 @media (max-width: 575.98px) {
     .pd { padding-top: 1rem; }
     .pd__aside { border-radius: 1.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pd__aside,
+    .pd__frame { animation: none; }
+    .pd__frame { transition: none; }
+    .pd__frame:hover { transform: none; }
 }
