@@ -6,6 +6,7 @@ ActivatableModel is opt-in and only mixed in where an is_active toggle
 makes sense (Subject, Course, Topic, Lesson, Question, ...).
 """
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
 
 
@@ -72,8 +73,18 @@ class Founder(TimeStampedModel, ActivatableModel, OrderedModel):
         return f'{self.full_name} — {self.role_title}'
 
 
+SITE_SETTINGS_CACHE_KEY = 'core:site_settings'
+SITE_SETTINGS_CACHE_TIMEOUT = 300  # 5 daqiqa — har sahifada o'qiladigan singleton
+
+
 class SiteSettings(TimeStampedModel):
-    """Singleton: logo, hero video va sayt sozlamalari."""
+    """Singleton: logo, hero video va sayt sozlamalari.
+
+    load() har sahifada (context_processors.site_branding orqali) chaqiriladi
+    — shu sabab natija qisqa muddatga keshlanadi. save() kesh'ni darhol
+    tozalaydi, shuning uchun admin panelda o'zgartirish 5 daqiqa kutmasdan
+    ko'rinadi.
+    """
 
     site_name = models.CharField(
         max_length=80, default='XYZ', verbose_name='sayt nomi',
@@ -120,10 +131,15 @@ class SiteSettings(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.pk = 1
         super().save(*args, **kwargs)
+        cache.delete(SITE_SETTINGS_CACHE_KEY)
 
     @classmethod
     def load(cls):
+        cached = cache.get(SITE_SETTINGS_CACHE_KEY)
+        if cached is not None:
+            return cached
         obj, _ = cls.objects.get_or_create(pk=1)
+        cache.set(SITE_SETTINGS_CACHE_KEY, obj, SITE_SETTINGS_CACHE_TIMEOUT)
         return obj
 
 

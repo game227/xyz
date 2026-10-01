@@ -27,8 +27,17 @@ def env_bool(key, default=False):
 # =========================================================
 # CORE
 # =========================================================
-SECRET_KEY = os.getenv('SECRET_KEY', 'insecure-dev-key-change-me')
+_INSECURE_SECRET_KEY_FALLBACK = 'insecure-dev-key-change-me'
+SECRET_KEY = os.getenv('SECRET_KEY', _INSECURE_SECRET_KEY_FALLBACK)
 DEBUG = env_bool('DEBUG', True)
+
+if not DEBUG and SECRET_KEY == _INSECURE_SECRET_KEY_FALLBACK:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured(
+        'SECRET_KEY .env faylida sozlanmagan. DEBUG=False bilan standart '
+        '(insecure) kalit ishlatib ishga tushirish taqiqlangan — .env da '
+        'haqiqiy SECRET_KEY belgilang.'
+    )
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
@@ -162,10 +171,18 @@ else:
 # PASSWORD VALIDATION
 # =========================================================
 AUTH_PASSWORD_VALIDATORS = [
-    # Faqat uzunlik: kamida 8 belgi. Qolgan qat’iy talablar olib tashlangan.
+    # Uzunlik + eng keng tarqalgan zaif parollarni bloklash. Murakkablik
+    # talablari (katta harf/raqam/belgi majburiyati) ataylab qo'shilmagan —
+    # loyihaning "MVP uchun sodda" qoidasiga ko'ra.
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
         'OPTIONS': {'min_length': 8},
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
 ]
 
@@ -225,6 +242,30 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_S3_FILE_OVERWRITE = False
     STORAGES['default'] = {
         'BACKEND': 'storages.backends.s3.S3Storage',
+    }
+
+# =========================================================
+# CACHE
+# =========================================================
+# Default: jarayon-ichi xotira keshi — bitta worker uchun yetarli (dev,
+# kichik deploy). Bir nechta worker/server bo'lsa (masalan gunicorn -w 4),
+# rate-limit va SiteSettings keshi worker'lar orasida sinxron bo'lmaydi —
+# shunday holatda CACHE_URL orqali Redis ulash tavsiya etiladi
+# (masalan: CACHE_URL=redis://localhost:6379/1).
+_cache_url = os.getenv('CACHE_URL', '').strip()
+if _cache_url:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': _cache_url,
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'xyz-default-cache',
+        }
     }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

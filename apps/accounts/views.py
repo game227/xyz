@@ -8,11 +8,20 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.views import LogoutView as DjangoLogoutView
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 
+from apps.core.utils import get_client_ip, is_rate_limited
+
 from .forms import LoginForm, ProfileForm, RegisterForm
 from .services import log_auth_event
+
+# IP boshiga chegaralar — brute-force / spam-registratsiyaning oldini oladi.
+LOGIN_ATTEMPT_LIMIT = 10
+LOGIN_ATTEMPT_WINDOW_SECONDS = 15 * 60
+REGISTER_LIMIT = 10
+REGISTER_WINDOW_SECONDS = 60 * 60
 
 
 def register_view(request):
@@ -20,6 +29,14 @@ def register_view(request):
         return redirect('progress:dashboard')
 
     if request.method == 'POST':
+        if is_rate_limited(
+            f'register:{get_client_ip(request)}', REGISTER_LIMIT, REGISTER_WINDOW_SECONDS
+        ):
+            messages.error(
+                request, 'Juda ko‘p urinish. Bir soatdan so‘ng qayta urinib ko‘ring.'
+            )
+            return render(request, 'accounts/register.html', {'form': RegisterForm()})
+
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
@@ -41,6 +58,17 @@ class LoginView(DjangoLoginView):
     template_name = 'accounts/login.html'
     authentication_form = LoginForm
     redirect_authenticated_user = True
+
+    def post(self, request, *args, **kwargs):
+        ip_key = f'login:{get_client_ip(request)}'
+        if is_rate_limited(ip_key, LOGIN_ATTEMPT_LIMIT, LOGIN_ATTEMPT_WINDOW_SECONDS):
+            log_auth_event(request, None, 'login_rate_limited')
+            messages.error(
+                request,
+                'Juda ko‘p noto‘g‘ri urinish. 15 daqiqadan so‘ng qayta urinib ko‘ring.',
+            )
+            return HttpResponse(status=429)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
